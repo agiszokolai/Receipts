@@ -1,0 +1,35 @@
+<div class="list-item-content">
+  <img
+    [src]="receipt().imageUrl"
+    alt="{{ receipt().name }}"
+    class="list-item-img"
+  />
+  <span class="list-item-name ps-3">{{ receipt().name }}</span>
+</div>
+<div class="list-item-footer">
+  <button class="btn receipt-button" (click)="navigateToReceipt()">
+    Recept
+  </button>
+  <div class="icons">
+    <i
+      class="fa-heart"
+      [ngClass]="{
+        'fa-solid': isLiked() || isHoveredHeart(),
+        'fa-regular': !(isLiked() || isHoveredHeart())
+      }"
+      (click)="setReceiptToLiked(!isLiked())"
+      (mouseenter)="isHoveredHeart.set(true)"
+      (mouseleave)="isHoveredHeart.set(false)"
+    ></i>
+    <i
+      class="fa-bookmark"
+      [ngClass]="{
+        'fa-solid': isSaved() || isHoveredBookMark(),
+        'fa-regular': !isSaved() || !isHoveredBookMark()
+      }"
+      (click)="setReceiptToSaved(!isSaved())"
+      (mouseenter)="isHoveredBookMark.set(true)"
+      (mouseleave)="isHoveredBookMark.set(false)"
+    ></i>
+  </div>
+</div>

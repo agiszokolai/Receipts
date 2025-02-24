@@ -1,0 +1,42 @@
+<div class="card">
+  <div class="img-container">
+    <img
+      [src]="receipt().imageUrl"
+      alt="{{ receipt().name }}"
+      class="fixed-img"
+    />
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{ receipt().name }}</h5>
+  </div>
+  <div class="card-footer">
+    <div class="icon">
+      <i
+        class="fa-heart"
+        [ngClass]="{
+          'fa-solid': isLiked() || isHoveredHeart(),
+          'fa-regular': !(isLiked() || isHoveredHeart())
+        }"
+        (click)="setReceiptToLiked(!isLiked())"
+        (mouseenter)="isHoveredHeart.set(true)"
+        (mouseleave)="isHoveredHeart.set(false)"
+      ></i>
+    </div>
+
+    <div class="receipt-button">
+      <button class="btn" (click)="navigateToReceipt()">Recept</button>
+    </div>
+    <div class="icon">
+      <i
+        class="fa-bookmark"
+        [ngClass]="{
+          'fa-solid': isSaved() || isHoveredBookMark(),
+          'fa-regular': !(isSaved() || isHoveredBookMark())
+        }"
+        (click)="setReceiptToSaved(!isSaved())"
+        (mouseenter)="isHoveredBookMark.set(true)"
+        (mouseleave)="isHoveredBookMark.set(false)"
+      ></i>
+    </div>
+  </div>
+</div>

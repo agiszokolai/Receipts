@@ -1,0 +1,106 @@
+<div class="receipt-container">
+  <div class="receipt-header">
+    <div class="header-left">
+      <img [src]="receipt!.imageUrl" [alt]="receipt!.name" />
+    </div>
+    <div class="header-right">
+      <div class="name">{{ receipt.name }}</div>
+      <div class="creator-rating">
+        <div class="creator">
+          <div class="creator-img">
+            <img [src]="creator!.profilePictureUrl" alt="" />
+          </div>
+          <div>{{ creator.name }}</div>
+        </div>
+        @if(receipt.reviews![0].likes){
+        <div class="rating">
+          <i class="fa-solid fa-heart pe-2"></i> {{ receipt.reviews![0].likes }}
+        </div>
+        }
+      </div>
+
+      <!-- TODO:ikonokat megnézni miért nem vált színt -->
+      <div class="receipt-save">
+        <button
+          class="btn"
+          [ngClass]="{ saved: isSaved() }"
+          (click)="setReceiptToSaved(!isSaved())"
+        >
+          <i
+            class="fa-bookmark me-2"
+            [ngClass]="{
+              'fa-solid': isSaved() || isHoveredBookMark(),
+              'fa-regular': !(isSaved() || isHoveredBookMark())
+            }"
+            (mouseenter)="isHoveredBookMark.set(true)"
+            (mouseleave)="isHoveredBookMark.set(false)"
+          ></i
+          >{{ isSaved() ? "Recept mentve" : "Recept mentése" }}
+        </button>
+        <div class="icon">
+          <i
+            class="fa-heart"
+            [ngClass]="{
+              'fa-solid': isLiked() || isHoveredHeart(),
+              'fa-regular': !(isLiked() || isHoveredHeart())
+            }"
+            (click)="setReceiptToLiked(!isLiked())"
+            (mouseenter)="isHoveredHeart.set(true)"
+            (mouseleave)="isHoveredHeart.set(false)"
+          ></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="receipt-body">
+    <div>
+      <div>{{ receipt.description }}</div>
+    </div>
+
+    <div class="body-steps-ingredients mt-3">
+      <div class="steps-ingredients-container">
+        <div class="steps">
+          <h5 class="text-left mt-4 mb-3">Elkészítés</h5>
+
+          <ol>
+            @for(s of receipt.steps!; track s){
+            <li>
+              {{ s }}
+            </li>
+            }
+          </ol>
+        </div>
+
+        <div class="ingredients">
+          <h5 class="text-left mt-4 mb-3">Hozzávalók</h5>
+          @for(i of receipt.ingredients!; track i.id){
+          <li>
+            {{ i.amount }}
+            {{ i.unit }}
+            {{ i.name }}
+          </li>
+
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="receipt-footer">
+    <div class="receipt-tags">
+      @for(t of receipt.tags!; track t){
+      <span class="tag">{{ t }}</span>
+      }
+    </div>
+    <div class="rating">
+      <div>Értékeld a receptet</div>
+      <div>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+      </div>
+    </div>
+  </div>
+</div>

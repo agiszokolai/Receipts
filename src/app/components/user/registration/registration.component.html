@@ -1,0 +1,46 @@
+<app-modal
+  [isModalVisible]="isRegistrationModalOpen()"
+  [header]="'Regisztráció'"
+  [size]="'medium'"
+  [footerButtonLabel]="'Regisztráció'"
+  [isFooterCancelVisible]="true"
+  [formGroup]="registrationForm"
+  [formTemplate]="registration"
+  (submitEvent)="onSubmit()"
+  (closeEvent)="closeModal()"
+></app-modal>
+
+<ng-template #registration>
+  <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
+    <div class="form-group">
+      <input type="email" id="email" formControlName="email" placeholder=" " />
+      <label for="email">E-mail cím:</label>
+    </div>
+    <div class="form-group">
+      <input type="text" id="name" formControlName="name" placeholder=" " />
+      <label for="name">Név:</label>
+    </div>
+    <div class="form-group">
+      <input type="text" id="username" formControlName="username" placeholder=" " />
+      <label for="username">Felhasználónév:</label>
+    </div>
+    <div class="form-group">
+      <input type="password" id="password" formControlName="password" placeholder=" " />
+      <label for="password">Jelszó:</label>
+    </div>
+    <div class="form-group">
+      <input
+        id="passwordConfirm"
+        type="password"
+        formControlName="passwordConfirm"
+        placeholder=" "
+      />
+      <label for="passwordConfirm">Jelszó megerősítése:</label>
+    </div>
+  </form>
+  <div class="footer w-100">
+    <button class="base-button" type="submit" [disabled]="registrationForm.invalid">
+      Regisztráció
+    </button>
+  </div>
+</ng-template>

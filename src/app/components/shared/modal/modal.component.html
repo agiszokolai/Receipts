@@ -1,0 +1,35 @@
+@if (isModalVisible()) {
+  <div class="custom-modal-backdrop"></div>
+  <div class="custom-modal" [ngClass]="size()">
+    <div class="header">
+      <h2>{{ header() }}</h2>
+      <i
+        class="fa-regular fa-circle-xmark"
+        (click)="onCloseModalClick()"
+        (keyup)="onCloseModalClick()"
+        tabindex="0"
+      ></i>
+    </div>
+    <div class="content h-100">
+      @if (formTemplate) {
+        <ng-container *ngTemplateOutlet="formTemplate"></ng-container>
+      }
+      <!-- @else if(content){
+
+      } -->
+    </div>
+    <div class="footer">
+      <!--    <button
+        class="base-button"
+        type="submit"
+        [disabled]="this.formGroup.invalid"
+        (click)="onSubmit()"
+      >
+        {{ footerButtonLabel() }}
+      </button> -->
+      @if (isFooterCancelVisible()) {
+        <button class="base-button" (click)="onCloseModalClick()">Mégse</button>
+      }
+    </div>
+  </div>
+}

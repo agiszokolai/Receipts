@@ -1,0 +1,88 @@
+@use "../variables/colors" as c;
+
+.back-button {
+  width: 30%;
+  button {
+    width: 90%;
+    border: 1px solid transparent !important;
+    margin: 0 0 15px;
+    padding: 5px 0px;
+    font-size: 0.9rem;
+    background-color: c.$yellow;
+
+    &:before {
+      width: 0%;
+      background-color: #faaf3e;
+    }
+
+    &:hover {
+      border: 1px solid black;
+      border: 1px solid black;
+      border-radius: 10px;
+      transform: scale(1.005);
+      &:before {
+        width: 100%;
+      }
+    }
+  }
+}
+.receipts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  overflow-y: auto;
+
+  i {
+    color: #faaf3e;
+    font-size: 2rem;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .name-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+
+    i {
+      font-size: 1.1rem;
+      align-self: self-start;
+      margin-top: 10px;
+    }
+  }
+}
+
+.receipt-card {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  text-align: center;
+  width: 200px;
+  cursor: pointer;
+
+  .img-container {
+    border-radius: 10px;
+  }
+}
+.folders {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  cursor: pointer;
+  i {
+    color: #faaf3e;
+    font-size: 2rem;
+    transition: transform 0.5s ease-in-out;
+    /*  &:hover {
+      transform: scale(1.1);
+    } */
+  }
+  .folder-card {
+    transition: transform 0.5s ease-in-out;
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}

@@ -1,0 +1,30 @@
+<app-modal
+  [isModalVisible]="isLoginModalOpen()"
+  [header]="'Bejelentkezés'"
+  [size]="'small'"
+  [footerButtonLabel]="'Bejelentkezés'"
+  [isFooterCancelVisible]="true"
+  [formGroup]="logInForm"
+  [formTemplate]="login"
+  (submitEvent)="onSubmit()"
+  (closeEvent)="closeModal()"
+></app-modal>
+
+<ng-template #login>
+  <form [formGroup]="logInForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
+    <div class="form-group">
+      <input type="email" id="email" formControlName="email" placeholder=" " />
+      <label for="email">E-mail cím:</label>
+    </div>
+    <div class="form-group">
+      <input type="password" id="password" formControlName="password" placeholder=" " />
+      <label for="password">Jelszó:</label>
+    </div>
+  </form>
+
+  <div class="footer w-100">
+    <button class="base-button" type="submit" [disabled]="logInForm.invalid" tabindex="0">
+      Bejelentkezés
+    </button>
+  </div>
+</ng-template>

@@ -1,0 +1,290 @@
+<div [ngSwitch]="formName()" class="forms-container">
+  <ng-container *ngSwitchCase="'registrationForm'">
+    <ng-container *ngTemplateOutlet="registration"></ng-container>
+  </ng-container>
+  <ng-container *ngSwitchCase="'logInForm'">
+    <ng-container *ngTemplateOutlet="login"></ng-container>
+  </ng-container>
+  <ng-container *ngSwitchCase="'receipeForm'">
+    <ng-container *ngTemplateOutlet="createReceipt"></ng-container>
+  </ng-container>
+</div>
+
+<!-- Regisztrációs form -->
+<ng-template #registration>
+  <form [formGroup]="registrationForm" (ngSubmit)="submitEvent.emit()">
+    <div class="form-group">
+      <input type="email" id="email" formControlName="email" placeholder=" " />
+      <label for="email">E-mail cím:</label>
+    </div>
+    <div class="form-group">
+      <input type="text" id="name" formControlName="name" placeholder=" " />
+      <label for="name">Név:</label>
+    </div>
+    <div class="form-group">
+      <input type="text" id="username" formControlName="username" placeholder=" " />
+      <label for="username">Felhasználónév:</label>
+    </div>
+    <div class="form-group">
+      <input type="password" id="password" formControlName="password" placeholder=" " />
+      <label for="password">Jelszó:</label>
+    </div>
+    <div class="form-group">
+      <input
+        id="passwordConfirm"
+        type="password"
+        formControlName="passwordConfirm"
+        placeholder=" "
+      />
+      <label for="passwordConfirm">Jelszó megerősítése:</label>
+    </div>
+  </form>
+  <div class="footer w-100">
+    <button
+      class="base-button"
+      type="submit"
+      [disabled]="registrationForm.invalid"
+      (click)="onSubmit()"
+    >
+      {{ footerButtonLabel() }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- Bejelentkezés form -->
+<ng-template #login>
+  <form [formGroup]="logInForm" (ngSubmit)="submitEvent.emit()">
+    <div class="form-group">
+      <input type="email" id="email" formControlName="email" placeholder=" " />
+      <label for="email">E-mail cím:</label>
+    </div>
+    <div class="form-group">
+      <input type="password" id="password" formControlName="password" placeholder=" " />
+      <label for="password">Jelszó:</label>
+    </div>
+  </form>
+
+  <div class="footer w-100">
+    <button class="base-button" type="submit" [disabled]="logInForm.invalid" (click)="onSubmit()">
+      {{ footerButtonLabel() }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- Recept létrehozás form -->
+<ng-template #createReceipt>
+  <form [formGroup]="receipeForm" class="receipt-form">
+    <div class="form-group align-self-end">
+      <input id="receiptName" formControlName="receiptName" type="text" placeholder=" " />
+      <label for="receiptName">Recept neve:</label>
+    </div>
+
+    <div class="form-group">
+      <textarea
+        id="description"
+        formControlName="description"
+        placeholder=" "
+        [rows]="4"
+      ></textarea>
+      <label for="description">Leírás:</label>
+    </div>
+
+    <div class="ingredients-container">
+      <h3>Hozzávalók</h3>
+      <div formArrayName="ingredients" class="ingredients">
+        <div
+          *ngFor="let ingredient of ingredients.controls; let i = index"
+          [formGroupName]="i"
+          class="ingredient-row"
+        >
+          <div class="form-group">
+            <input formControlName="ingredient" type="text" placeholder=" " />
+            <label for="ingredient">Hozzávaló neve:</label>
+          </div>
+
+          <div class="form-group">
+            <input formControlName="quantity" type="number" placeholder=" " />
+            <label for="quantity">Mennyiség:</label>
+          </div>
+
+          <div class="form-group custom-select">
+            <select formControlName="unit">
+              <option *ngFor="let unit of unitEnum" [value]="unit">
+                {{ unit }}
+              </option>
+            </select>
+            <div class="icon-container">
+              <i class="fa-solid fa-sort-down"></i>
+            </div>
+          </div>
+
+          <button type="button" class="remove-btn" (click)="onRemoveIngredientClick(i)">-</button>
+        </div>
+      </div>
+
+      <button type="button" class="base-button" (click)="onAddIngredientClick()">
+        + Hozzávaló hozzáadása
+      </button>
+    </div>
+
+    <div class="steps-container">
+      <h3>Elkészítési lépések</h3>
+      <div formArrayName="steps" class="steps">
+        <div
+          *ngFor="let step of steps.controls; let i = index"
+          [formGroupName]="i"
+          class="step-row"
+        >
+          <div class="step-index">{{ i + 1 }}.</div>
+          <div class="form-group">
+            <textarea formControlName="stepDescription" type="text" placeholder=" "></textarea>
+            <label for="stepDescription">Elkészítési lépés</label>
+          </div>
+          <button type="button" class="remove-btn" (click)="removeStep(i)">-</button>
+        </div>
+      </div>
+      <button type="button" class="base-button" (click)="onAddStepClick()">
+        + Lépés hozzáadása
+      </button>
+    </div>
+
+    <div class="form-group">
+      <input id="prepTime" formControlName="prepTime" type="number" placeholder=" " />
+      <label for="prepTime">Előkészítési idő (perc):</label>
+    </div>
+
+    <div class="form-group">
+      <input id="servings" formControlName="servings" type="number" placeholder=" " />
+      <label for="servings">Adagok száma:</label>
+    </div>
+
+    <div class="custom-select-group">
+      <div class="custom-select ps-3">
+        <div
+          class="custom-select-input dif"
+          [ngClass]="{ active: isDifficultyDropdownOpen }"
+          (click)="isDifficultyDropdownOpen = !isDifficultyDropdownOpen"
+          (keyup)="isDifficultyDropdownOpen = !isDifficultyDropdownOpen"
+          tabindex="0"
+        >
+          <div class="text-container">
+            {{ selectedDifficulty ? selectedDifficulty : "Nehézség" }}
+          </div>
+          <div class="icon-container">
+            <i
+              class="fa-solid"
+              [ngClass]="{
+                'fa-sort-up': isDifficultyDropdownOpen,
+                'fa-sort-down': !isDifficultyDropdownOpen,
+              }"
+            ></i>
+          </div>
+        </div>
+        <div class="custom-dropdown-menu" *ngIf="isDifficultyDropdownOpen">
+          <ul>
+            <li
+              *ngFor="let difficulty of difficultyEnum"
+              [ngClass]="{ 'active-item': selectedDifficulty === difficulty }"
+              (click)="
+                selectedDifficulty = difficulty;
+                this.receipeForm.get('difficulty')?.setValue(difficulty)
+              "
+              (keyup)="
+                selectedDifficulty = difficulty;
+                this.receipeForm.get('difficulty')?.setValue(difficulty)
+              "
+              tabindex="0"
+            >
+              {{ difficulty }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="custom-select ps-3">
+        <div
+          class="custom-select-input cat"
+          [ngClass]="{ active: isCategoryDropdownOpen }"
+          (click)="isCategoryDropdownOpen = !isCategoryDropdownOpen"
+          (keyup)="isCategoryDropdownOpen = !isCategoryDropdownOpen"
+          tabindex="0"
+        >
+          <div class="text-container">
+            {{ selectedCategory ? selectedCategory : "Kategória" }}
+          </div>
+          <div class="icon-container">
+            <i
+              class="fa-solid"
+              [ngClass]="{
+                'fa-sort-up': isCategoryDropdownOpen,
+                'fa-sort-down': !isCategoryDropdownOpen,
+              }"
+            ></i>
+          </div>
+        </div>
+        <div class="custom-dropdown-menu" *ngIf="isCategoryDropdownOpen">
+          <ul>
+            <li
+              *ngFor="let category of categoryEnum"
+              [ngClass]="{ 'active-item': selectedCategory === category }"
+              (click)="
+                selectedCategory = category; this.receipeForm.get('category')?.setValue(category)
+              "
+              (keyup)="
+                selectedCategory = category; this.receipeForm.get('category')?.setValue(category)
+              "
+              tabindex="0"
+            >
+              {{ category }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="tags-container">
+      <div class="container">
+        <div class="form-group">
+          <input
+            id="tagsInput"
+            type="text"
+            formControlName="newTag"
+            placeholder=" "
+            (keyup.enter)="onAddTagClick()"
+          />
+          <label for="tagsInput">Címkék:</label>
+        </div>
+        <div>
+          <button type="button" class="base-button" (click)="onAddTagClick()">+</button>
+        </div>
+      </div>
+      <div class="tags-list">
+        @for (t of tagsList(); track t) {
+          <div class="tag">
+            <span>{{ t }}</span>
+            <i
+              class="fa-solid fa-circle-xmark"
+              (click)="onRemoveTagClick(t)"
+              (keyup)="onRemoveTagClick(t)"
+              tabindex="0"
+            ></i>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input
+        id="imageUrl"
+        formControlName="imageUrl"
+        type="file"
+        (change)="onFileSelected($event)"
+      /><label for="imageUrl">Kép:</label>
+    </div>
+  </form>
+  <div class="footer w-100">
+    <button class="base-button" type="submit" (click)="onSubmit()" [disabled]="receipeForm.invalid">
+      {{ footerButtonLabel() }}
+    </button>
+  </div>
+</ng-template>

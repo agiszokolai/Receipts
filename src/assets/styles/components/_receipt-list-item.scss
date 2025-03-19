@@ -1,0 +1,45 @@
+@use "../variables/colors" as c;
+
+.list-item-content {
+  width: 100%;
+
+  align-items: center;
+  gap: 15px;
+}
+
+.list-item-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.list-item-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.list-item-footer {
+  display: flex;
+  justify-content: end;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 10px;
+
+  .icons {
+    display: flex;
+    gap: 10px;
+
+    i {
+      color: c.$yellow;
+      text-shadow: 0 0 1px #000;
+      transition: all 0.5s ease-in-out;
+      cursor: pointer;
+
+      &:hover {
+        transform: scale(1.3);
+        color: #faaf3e;
+      }
+    }
+  }
+}

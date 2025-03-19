@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { effect, Injectable, signal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -12,17 +12,54 @@ export class SearchService {
   filteredList$ = this.filteredListSubject.asObservable();
 
   searchedText = signal('');
+  selectedCategories = signal<string[]>([]);
 
-  change(value: string) {
+  constructor() {
+    effect(() => {
+      this.applyFilter(
+        this.originalList.getValue(),
+        this.searchedText(),
+        this.selectedCategories(),
+      );
+    });
+  }
+
+  // Beállítja az eredeti listát
+  setOriginalList(newList: any[]) {
+    this.originalList.next(newList);
+  }
+
+  // szűrt lista
+  setFilteredList(list: any[]): void {
+    this.filteredListSubject.next(list);
+  }
+
+  // Keresési szöveg változik
+  changeSearchText(value: string) {
     this.searchedText.set(value);
   }
 
-  setOriginalList(newList: any[]) {
-    this.originalList.next(newList);
-    console.log(this.originalList);
+  // Kiválasztott kategóriák változnak
+  changeSelectedCategories(categories: string[]) {
+    this.selectedCategories.set(categories);
   }
 
-  setFilteredList(list: any[]): void {
-    this.filteredListSubject.next(list);
+  // Szűrés
+  private applyFilter(list: any[], searchText: string, categories: string[]) {
+    let filteredList = list;
+
+    if (categories.length > 0) {
+      filteredList = filteredList.filter((item) =>
+        categories.some((category) => item.category.includes(category)),
+      );
+    }
+
+    if (searchText.trim() !== '') {
+      filteredList = filteredList.filter((item) =>
+        item.name.toLowerCase().includes(searchText.toLowerCase()),
+      );
+    }
+
+    this.setFilteredList(filteredList); // Hívjuk a setFilteredList-t, hogy biztosítsuk a frissítést
   }
 }

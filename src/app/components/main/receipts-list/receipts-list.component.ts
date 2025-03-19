@@ -1,94 +1,69 @@
-import {
-  AfterViewInit,
-  Component,
-  HostListener,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
-import { Receipt } from '../../../model/receipt';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { IReceipt } from '../../../model/receipt';
 import { ReplaySubject, take, takeUntil } from 'rxjs';
 import { ReceiptsService } from '../../../services/receipts.service';
 import { SearchService } from '../../../services/search.service';
 import { CommonModule } from '@angular/common';
-import { animate, style, transition, trigger } from '@angular/animations';
-import * as bootstrap from 'bootstrap';
 import { ReceiptCardComponent } from './receipt-card/receipt-card.component';
 import { UserService } from '../../../services/user.service';
-import { User } from '../../../model/user';
-import { AppModule } from '../../../app.module';
+import { IUser } from '../../../model/user';
 import { ReceiptListItemComponent } from './receipt-list-item/receipt-list-item.component';
-import { FadeSwitchDirective } from '../../../directives/fade-switch.directive';
+import { FadeDirective } from '../../../directives/fade.directive';
 
 @Component({
   selector: 'app-receipts-list',
   standalone: true,
   templateUrl: './receipts-list.component.html',
   styleUrl: './receipts-list.component.scss',
-  imports: [
-    CommonModule,
-    ReceiptCardComponent,
-    ReceiptListItemComponent,
-    FadeSwitchDirective,
-  ],
-
-  /*   animations: [
-    trigger('fadeSwitch', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'scale(0.95)' }),
-        animate(
-          '300ms ease-in-out',
-          style({ opacity: 1, transform: 'scale(1)' })
-        ),
-      ]),
-      transition(':leave', [
-        animate(
-          '300ms ease-in-out',
-          style({ opacity: 0, transform: 'scale(0.95)' })
-        ),
-      ]),
-    ]),
-  ], */
+  imports: [CommonModule, ReceiptCardComponent, ReceiptListItemComponent, FadeDirective],
 })
-export class ReceiptsListComponent implements OnInit {
-  receipts: Receipt[] = [];
-  filteredList: Receipt[] = [];
+export class ReceiptsListComponent implements OnInit, OnDestroy {
+  /**  Belépett felhasználó  */
+  user = signal<IUser | null>(null);
 
+  /** Receptek listája */
+  receipts: IReceipt[] = [];
+
+  /**
+   * Szűrt receptek listája (keresés, kategória választás)
+   */
+  filteredList: IReceipt[] = [];
+
+  /** Listák megjelenítésének típusa  */
   viewMode: 'grid' | 'list' = 'grid';
+
+  /**  Nézet közötti átváltás  */
   fadeSwitchState = true;
 
-  user = signal<User | null>(null);
-
   private readonly destroyed$ = new ReplaySubject<void>(1);
+
   private receiptsService = inject(ReceiptsService);
   private searchService = inject(SearchService);
   private userService = inject(UserService);
 
   ngOnInit(): void {
-    this.getUser();
-    this.getReceipts();
+    this.userService.user$.pipe(takeUntil(this.destroyed$)).subscribe((u) => {
+      this.user.set(u);
+      console.log(this.user());
+
+      this.getReceipts();
+    });
     this.searchService.filteredList$.subscribe((list) => {
       this.filteredList = list;
     });
   }
 
-  getUser(): void {
-    this.userService
-      .getUserById(1)
-      .pipe(take(1))
-      .subscribe({
-        next: (u: User) => {
-          this.user.set(u);
-        },
-      });
-  }
-
+  /**
+   * Receptek lekérdezése
+   */
   getReceipts(): void {
     this.receiptsService
       .getReceipts()
       .pipe(takeUntil(this.destroyed$))
       .subscribe({
-        next: (r: Receipt[]) => {
+        next: (r: IReceipt[]) => {
+          console.log('receptek');
+
           this.receipts = r;
           this.searchService.setOriginalList(this.receipts);
         },
@@ -98,11 +73,94 @@ export class ReceiptsListComponent implements OnInit {
       });
   }
 
-  //TODO: megcsinálni hogyha nézetváltás történik ne tűnj9n el az új kedvelés vagy mentés
+  /**
+   * Ellenőrzi, hogy az aktuális receptet a bejelentkezett felhasználó mentette-e.
+   *
+   * @param {number} receiptId - Az ellenőrizendő recept azonosítója.
+   * @returns {boolean} `true`, ha a recept mentve van, különben `false`.
+   */
+  isSavedByUser(receiptId: number): boolean {
+    return this.user()?.receipts?.saved?.includes(receiptId) ?? false;
+  }
+
+  /**
+   * Ellenőrzi, hogy az aktuális receptet a bejelentkezett felhasználó kedvelte-e.
+   *
+   * @param {number} receiptId - Az ellenőrizendő recept azonosítója.
+   * @returns {boolean} `true`, ha a recept kedvelve van, különben `false`.
+   */
+  isLikedByUser(receiptId: number): boolean {
+    return this.user()?.receipts?.liked?.includes(receiptId) ?? false;
+  }
+
+  /**
+   * Kezeli egy recept mentett állapotának változását a felhasználónál.
+   *
+   * @param {{ receiptId: number; saved: boolean }} event - Az esemény objektum, amely tartalmazza a recept azonosítóját és a mentési állapotot.
+   * @returns {void}
+   */
+  handleSavedChange(event: { receiptId: number; saved: boolean }): void {
+    console.log(`Receipt ID: ${event.receiptId}, saved: ${event.saved}`);
+
+    const currentUser = this.user();
+    if (!currentUser) return;
+
+    const updatedUser = {
+      ...currentUser,
+      receipts: {
+        ...currentUser.receipts,
+        saved: event.saved
+          ? [...currentUser.receipts.saved, event.receiptId]
+          : currentUser.receipts.saved.filter((id) => id !== event.receiptId),
+      },
+    };
+
+    this.userService.updateUser(updatedUser).subscribe(() => {
+      this.user.set(updatedUser);
+    });
+    console.log('mentettek:', this.user()?.receipts.saved);
+  }
+
+  /**
+   * Kezeli egy recept kedvelt állapotának változását a felhasználónál.
+   *
+   * @param {{ receiptId: number; saved: boolean }} event - Az esemény objektum, amely tartalmazza a recept azonosítóját és a kedvelési állapotot.
+   * @returns {void}
+   */
+  handleLikedChange(event: { receiptId: number; liked: boolean }): void {
+    console.log(`Receipt ID: ${event.receiptId}, liked: ${event.liked}`);
+
+    this.userService.user$.pipe(take(1)).subscribe((user) => {
+      if (user) {
+        const updatedUser = {
+          ...user,
+          receipts: {
+            ...user.receipts,
+            liked: event.liked
+              ? [...user.receipts.liked, event.receiptId]
+              : user.receipts.liked.filter((id) => id !== event.receiptId),
+          },
+        };
+
+        this.userService.updateUser(updatedUser).subscribe(() => {
+          this.user.set(updatedUser);
+        });
+      }
+    });
+  }
+
+  /**
+   * Nézet beállítása
+   */
   toggleViewMode() {
-    this.fadeSwitchState = false; // Először elindítjuk a kilépő animációt
+    this.fadeSwitchState = false;
 
     this.viewMode = this.viewMode === 'grid' ? 'list' : 'grid';
-    this.fadeSwitchState = true; // Új nézet betöltésekor aktiváljuk a belépő animációt
+    this.fadeSwitchState = true;
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 }

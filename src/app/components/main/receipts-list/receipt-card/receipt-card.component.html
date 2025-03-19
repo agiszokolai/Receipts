@@ -1,10 +1,11 @@
 <div class="card">
-  <div class="img-container">
-    <img
-      [src]="receipt().imageUrl"
-      alt="{{ receipt().name }}"
-      class="fixed-img"
-    />
+  <div
+    class="img-container"
+    (click)="navigateToReceipt()"
+    tabindex="0"
+    (keyup)="navigateToReceipt()"
+  >
+    <img [src]="receipt().imageUrl" [alt]="receipt().name" class="fixed-img" />
   </div>
   <div class="card-body">
     <h5 class="card-title">{{ receipt().name }}</h5>
@@ -14,12 +15,14 @@
       <i
         class="fa-heart"
         [ngClass]="{
-          'fa-solid': isLiked() || isHoveredHeart(),
-          'fa-regular': !(isLiked() || isHoveredHeart())
+          'fa-solid': likedByUser() || isHeartHovered,
+          'fa-regular': !(likedByUser() || isHeartHovered),
         }"
-        (click)="setReceiptToLiked(!isLiked())"
-        (mouseenter)="isHoveredHeart.set(true)"
-        (mouseleave)="isHoveredHeart.set(false)"
+        (click)="onLikedClick(receipt(), !likedByUser())"
+        (keyup)="onLikedClick(receipt(), !likedByUser())"
+        (mouseenter)="isHeartHovered = true"
+        (mouseleave)="isHeartHovered = false"
+        tabindex="0"
       ></i>
     </div>
 
@@ -30,13 +33,21 @@
       <i
         class="fa-bookmark"
         [ngClass]="{
-          'fa-solid': isSaved() || isHoveredBookMark(),
-          'fa-regular': !(isSaved() || isHoveredBookMark())
+          'fa-solid': saveddByUser() || isBookMarkHovered,
+          'fa-regular': !(saveddByUser() || isBookMarkHovered),
         }"
-        (click)="setReceiptToSaved(!isSaved())"
-        (mouseenter)="isHoveredBookMark.set(true)"
-        (mouseleave)="isHoveredBookMark.set(false)"
+        (click)="onSavedClick(receipt(), !saveddByUser())"
+        (keyup)="onSavedClick(receipt(), !saveddByUser())"
+        (mouseenter)="isBookMarkHovered = true"
+        (mouseleave)="isBookMarkHovered = false"
+        tabindex="0"
       ></i>
     </div>
   </div>
 </div>
+@if (isModalOpen) {
+  <app-authentication-warning-modal
+    [isModalOpen]="isModalOpen"
+    (closeModal)="isModalOpen = false"
+  ></app-authentication-warning-modal>
+}

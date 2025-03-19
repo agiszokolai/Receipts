@@ -2,34 +2,34 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: 'receipts-list',
+    path: 'receptek',
     pathMatch: 'full',
     loadComponent: () =>
       import('./components/main/receipts-list/receipts-list.component').then(
-        (m) => m.ReceiptsListComponent
+        (m) => m.ReceiptsListComponent,
       ),
   },
   {
-    path: 'receipt',
+    path: 'recept/:name',
     loadComponent: () =>
       import('./components/main/receipts-list/receipt/receipt.component').then(
-        (m) => m.ReceiptComponent
+        (m) => m.ReceiptComponent,
       ),
   },
   {
-    path: 'user',
+    path: 'profil/:username',
     loadComponent: () =>
       import('./components/user/user-profile/user-profile.component').then(
-        (u) => u.UserProfileComponent
+        (u) => u.UserProfileComponent,
       ),
   },
   {
     path: '',
-    redirectTo: 'receipts-list',
+    redirectTo: 'receptek',
     pathMatch: 'full',
   },
   {
     path: '**',
-    redirectTo: 'receipts-list',
+    redirectTo: 'receptek',
   },
 ];

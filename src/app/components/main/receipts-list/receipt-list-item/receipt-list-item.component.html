@@ -1,35 +1,39 @@
 <div class="list-item-content">
-  <img
-    [src]="receipt().imageUrl"
-    alt="{{ receipt().name }}"
-    class="list-item-img"
-  />
+  <img [src]="receipt().imageUrl" [alt]="receipt().name" class="list-item-img" />
   <span class="list-item-name ps-3">{{ receipt().name }}</span>
 </div>
 <div class="list-item-footer">
-  <button class="btn receipt-button" (click)="navigateToReceipt()">
-    Recept
-  </button>
+  <button class="btn receipt-button" (click)="navigateToReceipt()">Recept</button>
   <div class="icons">
     <i
+      tabindex="0"
       class="fa-heart"
       [ngClass]="{
-        'fa-solid': isLiked() || isHoveredHeart(),
-        'fa-regular': !(isLiked() || isHoveredHeart())
+        'fa-solid': isLiked || isHeartHovered,
+        'fa-regular': !(isLiked || isHeartHovered),
       }"
-      (click)="setReceiptToLiked(!isLiked())"
-      (mouseenter)="isHoveredHeart.set(true)"
-      (mouseleave)="isHoveredHeart.set(false)"
+      (keyup)="onLikedClick(receipt(), !isLiked)"
+      (click)="onLikedClick(receipt(), !isLiked)"
+      (mouseenter)="isHeartHovered = true"
+      (mouseleave)="isHeartHovered = false"
     ></i>
     <i
       class="fa-bookmark"
       [ngClass]="{
-        'fa-solid': isSaved() || isHoveredBookMark(),
-        'fa-regular': !isSaved() || !isHoveredBookMark()
+        'fa-solid': isSaved || isBookMarkHovered,
+        'fa-regular': !isSaved || !isBookMarkHovered,
       }"
-      (click)="setReceiptToSaved(!isSaved())"
-      (mouseenter)="isHoveredBookMark.set(true)"
-      (mouseleave)="isHoveredBookMark.set(false)"
+      (click)="onSavedClick(receipt(), !isSaved)"
+      (keyup)="onSavedClick(receipt(), !isSaved)"
+      (mouseenter)="isBookMarkHovered = true"
+      (mouseleave)="isBookMarkHovered = false"
+      tabindex="0"
     ></i>
   </div>
 </div>
+@if (isModalOpen) {
+  <app-authentication-warning-modal
+    [isModalOpen]="isModalOpen"
+    (closeModal)="isModalOpen = false"
+  ></app-authentication-warning-modal>
+}

@@ -1,22 +1,38 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { Receipt } from '../model/receipt';
+import { IReceipt, IReview } from '../model/receipt';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReceiptsService {
-  constructor() {}
-
-  getReceipts(): Observable<Receipt[]> {
+  getReceipts(): Observable<IReceipt[]> {
     return of([]);
   }
 
-  getReceiptById(id: number): Observable<Receipt | null> {
-    return of(null); // Ha nincs adat, null-t adunk vissza
+  getReceiptById(id: number): Observable<IReceipt | null> {
+    return of(null);
+  }
+  getReceiptByName(name: string): Observable<IReceipt | null> {
+    return of(null);
+  }
+  getReceiptsByIds(ids: number[]): Observable<IReceipt[]> {
+    return of([]);
   }
 
-  getReceiptsByIds(ids: number[]): Observable<Receipt[]> {
-    return of([]);
+  createReceipt(newReceipt: IReceipt): Observable<IReceipt | null> {
+    return of(null);
+  }
+
+  updateReceipt(receipt: IReceipt): Observable<IReceipt | null> {
+    return of(null);
+  }
+  addReview(review: IReview, receiptId: number): Observable<IReceipt | null> {
+    return of(null);
+  }
+
+  // Az értékelés frissítése
+  updateReview(review: IReview, receiptId: number): Observable<IReceipt | null> {
+    return of(null);
   }
 }

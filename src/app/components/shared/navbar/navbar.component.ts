@@ -1,142 +1,94 @@
-import {
-  Component,
-  HostListener,
-  inject,
-  input,
-  OnInit,
-  output,
-  signal,
-} from '@angular/core';
+import { AfterViewInit, Component, HostListener, inject, OnInit, signal } from '@angular/core';
 import { SearchService } from '../../../services/search.service';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
-import { CategoryEnum } from '../../../model/receipt';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { UserService } from '../../../services/user.service';
-import { take } from 'rxjs';
-import { User } from '../../../model/user';
+import { IUser } from '../../../model/user';
 import { ModalComponent } from '../modal/modal.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CategoryEnum } from '../../../helpers/constants';
+import { LoginComponent } from '../../user/login/login.component';
+import { RegistrationComponent } from '../../user/registration/registration.component';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, ModalComponent],
+  imports: [
+    CommonModule,
+    ModalComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    LoginComponent,
+    RegistrationComponent,
+  ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
 })
-export class NavbarComponent implements OnInit {
-  resultList = output<any[]>();
+export class NavbarComponent implements OnInit, AfterViewInit {
+  /** Bejelentkezett felhasználó*/
+  user = signal<IUser | null>(null);
 
-  searchList: any[] = [];
-  filteredList: any[] = [];
-  selectedCategories: string[] = [];
-  categoryEnum = Object.values(CategoryEnum);
-
-  user = signal<User | null>(null);
-
-  logInForm = new FormGroup({
-    email: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required),
-  });
-  registrationForm = new FormGroup({
-    email: new FormControl('', Validators.required),
-    username: new FormControl('', Validators.required),
-    name: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required),
-    passwordConfirm: new FormControl('', [
-      Validators.required,
-      this.passwordConfirmValidator(),
-    ]),
-  });
-
+  /** Felahsználói menü le van e nyitva */
   isUserMenuOpen = signal(false);
+
+  /** Bejelentkezési modal nyitva van-e */
   isLoginModalOpen = signal(false);
+
+  /** Regisztrációs modal nyitva van-e */
   isRegistrationModalOpen = signal(false);
 
-  searchText: string = '';
+  /** Kiválasztott kategóriák*/
+  selectedCategories: string[] = [];
 
-  selectedOption: string[] = [];
+  /** Kategóriák */
+  categoryEnum = Object.values(CategoryEnum);
 
+  /** Keresett szöveg */
+  searchText = '';
+
+  /** Kategóriák selectje le van-e nyitva */
   isDropdownOpen = false;
 
   private searchService = inject(SearchService);
   private router = inject(Router);
   private userService = inject(UserService);
+  private toastr = inject(ToastrService);
 
   ngOnInit(): void {
+    this.searchService.originalList$.subscribe((list) => {
+      this.searchService.setFilteredList(list);
+    });
+  }
+
+  ngAfterViewInit(): void {
     this.userService.user$.subscribe({
       next: (u) => {
         this.user.set(u); // A felhasználó adatainak beállítása
-        console.log('navbar: ', this.user);
-      },
-    });
-
-    this.searchService.originalList$.subscribe({
-      next: (list) => {
-        this.searchList = list;
-        this.filterList();
       },
     });
   }
 
+  /** Keresendő szó változik */
   onSearchChange() {
-    this.filterList();
+    this.searchService.changeSearchText(this.searchText);
   }
 
-  onCategoryChange(category: string) {
-    // Kategória változás kezelése
-    this.selectOption(category);
-    if (this.selectedCategories.length > 0) {
-      this.filterList();
-    } else {
-      this.searchService.setFilteredList(this.searchList);
-    }
+  /** Kiválasztott katgóriák változnak */
+  onChangeCategoryClick(category: string) {
+    this.selectedCategories = this.selectedCategories.includes(category)
+      ? this.selectedCategories.filter((c) => c !== category)
+      : [...this.selectedCategories, category];
+
+    this.searchService.changeSelectedCategories(this.selectedCategories);
   }
 
-  selectOption(category: string) {
-    const index = this.selectedCategories.indexOf(category);
-    if (index > -1) {
-      this.selectedCategories.splice(index, 1);
-    } else {
-      this.selectedCategories.push(category);
-    }
-  }
-
-  filterList(): void {
-    if (this.searchText.trim() === '' && this.selectedCategories.length === 0) {
-      this.searchService.setFilteredList(this.searchList);
-    } else {
-      this.searchService.originalList$.subscribe((list) => {
-        let filteredList = list;
-        //Ha van kategória
-        if (this.selectedCategories.length > 0) {
-          filteredList = filteredList.filter((item) =>
-            this.selectedCategories.some((category) =>
-              item.category.includes(category)
-            )
-          );
-        }
-        //Ha van beírt szöveg
-        if (this.searchText.trim() !== '') {
-          filteredList = filteredList.filter((item) =>
-            item.name.toLowerCase().includes(this.searchText.toLowerCase())
-          );
-        }
-
-        this.searchService.setFilteredList(filteredList);
-      });
-    }
-  }
-
+  /** */
+  /**
+   *  Kiválasztott kategóriák megjelenítésének formázása
+   * @param {string[]} selected a kiválasztott kategóriák listája
+   * @returns Visszaddja a lista formázott alakját
+   */
   formatSelectedCategory(selected: string[]): string {
     if (selected.length <= 2) {
       return selected.join(', ');
@@ -144,105 +96,60 @@ export class NavbarComponent implements OnInit {
     return `${selected.slice(0, 2).join(', ')} ...`;
   }
 
+  /** Navigálás a belépett felhasználó profiljára */
   openUserPage(): void {
-    console.log(this.user()?.username);
-
     this.isUserMenuOpen.set(false);
-    this.router.navigate(['/user'], {
-      queryParams: { id: this.user()?.userId },
-    });
+    this.router.navigate(['/profil', this.user()?.username]);
   }
 
+  navigateToLandingPage(): void {
+    this.router.navigate(['/']);
+  }
+
+  /** Kijelentkezés */
   logout(): void {
     if (this.user()) {
-      this.userService.logOut(this.user()!).subscribe((success) => {
-        if (success) {
-          console.log('Sikeres kijelentkezés!');
-          this.user.set(null);
-          this.router.navigate(['/']);
-        } else {
-          console.log('Nem volt bejelentkezett felhasználó.');
-        }
+      this.userService.logOut().subscribe({
+        next: () => {
+          this.selectedCategories = [];
+          this.searchText = '';
+          console.log('Kijelentkezve!');
+          this.toastr.info('Sikeres kijelentkezés');
+        },
+        error: () => {
+          this.toastr.error('Sikertelen kijelentkezés');
+        },
       });
     }
-  }
-
-  logIn(formData: any) {
-    console.log('Bejelentkezés adat:', formData);
-
-    const { email, password } = formData;
-
-    this.userService
-      .logIn(email, password)
-      .pipe(take(1))
-      .subscribe({
-        next: (u) => {
-          if (u) {
-            this.user.set(u);
-            console.log('Sikeres bejelentkezés:', u);
-            this.isLoginModalOpen.set(false);
-          }
-        },
-        error: (error) => {
-          console.error('Hiba történt:', error.message);
-          alert('Hibás email vagy jelszó!');
-        },
+    /*  if (this.user()) {
+      this.userService.logOut().subscribe(() => {
+        this.selectedCategories = [];
+        this.searchText = '';
+        console.log('Kijelentkezve!');
+        this.toastr.info('Sikeres kijelentkezés');
       });
+    } */
   }
 
-  registration(formData: any) {
-    // Az adatokat itt kapod meg
-    console.log('Regisztráció adat:', formData);
-
-    const { email, name, username, password, passwordConfirm } = formData;
-
-    this.userService
-      .registration(email, username, password)
-      .pipe(take(1))
-      .subscribe({
-        next: (u) => {
-          this.user.set(u);
-          console.log('Sikeres regisztráció:', this.user());
-          this.isRegistrationModalOpen.set(false);
-          this.router.navigate(['/user'], {
-            queryParams: { id: this.user()?.userId },
-          });
-        },
-        error: (error) => {
-          console.log('Hiba történt:', error.message);
-        },
-      });
-  }
-
+  /** Modal bezárása */
   closeModal() {
     if (this.isLoginModalOpen()) {
-      this.isLoginModalOpen.set(false); // Modal bezárása
+      this.isLoginModalOpen.set(false);
     } else if (this.isRegistrationModalOpen()) {
-      this.isRegistrationModalOpen.set(false); // Regisztrációs modal bezárása
+      this.isRegistrationModalOpen.set(false);
     }
   }
 
-  passwordConfirmValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!control.parent) return null;
-      const password = control.parent.get('password')?.value;
-      const passwordConfirm = control.value;
-
-      return password !== passwordConfirm ? { passwordConfirm: true } : null;
-    };
-  }
-
+  //** Legördülő menük bezárása ha nem oda van kattintva */
   @HostListener('document:click', ['$event'])
   handleClick(event: MouseEvent) {
     const targetElement = event.target as HTMLElement;
 
-    // Kivétel: ha kattintás a menüben vagy a felhasználói ikonon történt
     const isClickInsideUserMenu =
-      targetElement.closest('.user-icon') ||
-      targetElement.closest('.user-menu');
+      targetElement.closest('.user-icon') || targetElement.closest('.user-menu');
 
     if (!isClickInsideUserMenu) {
-      this.isUserMenuOpen.set(false); // Bezárja a felhasználói menüt
+      this.isUserMenuOpen.set(false);
     }
 
     const isClickInsideDropdown =
@@ -250,7 +157,7 @@ export class NavbarComponent implements OnInit {
       targetElement.closest('.custom-dropdown-menu');
 
     if (!isClickInsideDropdown) {
-      this.isDropdownOpen = false; // Bezárja a kategóriák legördülő menüt
+      this.isDropdownOpen = false;
     }
   }
 }

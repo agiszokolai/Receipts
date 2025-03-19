@@ -1,71 +1,94 @@
-@if(clickedFolder){
-<div class="back-button">
-  <button type="button" (click)="clickedFolderChange.emit(null); page.set(1)">
-    Vissza
-  </button>
-</div>
-} @if(activeMenu !='saved'){
-<div class="receipts">
-  @for(receipt of menuList; track receipt.id){
-  <div class="receipt-card" (click)="navigateToReceipt.emit(receipt)">
-    <div class="img-container">
-      <img
-        class="fixed-img"
-        [src]="receipt.imageUrl"
-        alt="{{ receipt.name }}"
-      />
+@if (clickedFolder()) {
+  <div class="back-button">
+    <button type="button" (click)="clickedFolderChange.emit(null); page.set(1)">Vissza</button>
+  </div>
+}
+@if (activeMenu() !== "saved") {
+  <div class="receipts">
+    @for (receipt of menuList(); track receipt.id) {
+      <div class="receipt-card">
+        <div
+          class="img-container"
+          (click)="navigateToReceipt.emit(receipt)"
+          (keyup)="navigateToReceipt.emit(receipt)"
+          tabindex="0"
+        >
+          <img
+            class="fixed-img"
+            [src]="receipt.imageUrl?.length ? receipt.imageUrl : blankFood"
+            alt="{{ receipt.name }}"
+          />
+        </div>
+        <div class="name-container">
+          @if (activeMenu() === "own" && isOwnPage()) {
+            <i
+              class="fa-solid fa-pen-to-square"
+              (click)="editReceipt.emit(receipt)"
+              tabindex="0"
+              (keyup)="editReceipt.emit(receipt)"
+            ></i>
+          }
+          <p class="mt-2">{{ receipt.name }}</p>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  @if (!clickedFolder && page() === 1) {
+    <div class="back-button">
+      <button type="button" (click)="page.set(0)">Vissza</button>
     </div>
-    <p>{{ receipt.name }}</p>
-  </div>
-  }
-</div>
-} @else { @if(!clickedFolder && page()==1){
-<div class="back-button">
-  <button type="button" (click)="page.set(0)">Vissza</button>
-</div>
-<div class="folders">
-  @for(folder of userCollections; track folder.id){
-  <div class="folder-card" (click)="folderClicked.emit(folder); page.set(2)">
-    <i class="fa-regular fa-folder"></i>
-    <p>{{ folder.name }}</p>
-  </div>
-  }
-</div>
-
-} @else if(page() == 2){
-<div class="receipts">
-  @for(receipt of menuList; track receipt.id){
-  <div class="receipt-card" (click)="navigateToReceipt.emit(receipt)">
-    <div class="img-container">
-      <img
-        class="fixed-img"
-        [src]="receipt.imageUrl"
-        alt="{{ receipt.name }}"
-      />
+    <div class="folders">
+      @for (folder of userCollections(); track folder.id) {
+        <div
+          class="folder-card"
+          (click)="folderClicked.emit(folder); page.set(2)"
+          (keyup)="folderClicked.emit(folder); page.set(2)"
+          tabindex="0"
+        >
+          <i class="fa-regular fa-folder"></i>
+          <p>{{ folder.name }}</p>
+        </div>
+      }
     </div>
-    <p>{{ receipt.name }}</p>
-  </div>
-  }
-</div>
-} @if(page() == 0){
-<div class="receipts">
-  <div class="folders mt-4">
-    <div class="folder-card" (click)="page.set(1)">
-      <i class="fa-regular fa-folder"></i>
-      <p>Gyűjtemények</p>
+  } @else if (page() === 2) {
+    <div class="receipts">
+      @for (receipt of menuList(); track receipt.id) {
+        <div
+          class="receipt-card"
+          (click)="navigateToReceipt.emit(receipt)"
+          (keyup)="navigateToReceipt.emit(receipt)"
+          tabindex="0"
+        >
+          <div class="img-container">
+            <img class="fixed-img" [src]="receipt.imageUrl ?? blankFood" alt="{{ receipt.name }}" />
+          </div>
+          <p>{{ receipt.name }}</p>
+        </div>
+      }
     </div>
-  </div>
-  @for(receipt of userSavedReceipts ; track receipt.id){
-  <div class="receipt-card" (click)="navigateToReceipt.emit(receipt)">
-    <div class="img-container">
-      <img
-        class="fixed-img"
-        [src]="receipt.imageUrl"
-        alt="{{ receipt.name }}"
-      />
-    </div>
-    <p>{{ receipt.name }}</p>
-  </div>
   }
-</div>
-} }
+  @if (page() === 0) {
+    <div class="receipts">
+      <div class="folders mt-4">
+        <div class="folder-card" (click)="page.set(1)" (keyup)="page.set(1)" tabindex="0">
+          <i class="fa-regular fa-folder"></i>
+          <p>Gyűjtemények</p>
+        </div>
+      </div>
+      @for (receipt of userSavedReceipts(); track receipt.id) {
+        <div
+          class="receipt-card"
+          (click)="navigateToReceipt.emit(receipt)"
+          (keyup)="navigateToReceipt.emit(receipt)"
+          tabindex="0"
+        >
+          <div class="img-container">
+            <img class="fixed-img" [src]="receipt.imageUrl ?? blankFood" alt="{{ receipt.name }}" />
+          </div>
+          <p>{{ receipt.name }}</p>
+        </div>
+      }
+    </div>
+  }
+}

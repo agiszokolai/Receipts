@@ -2,40 +2,49 @@ import {
   Component,
   EventEmitter,
   inject,
-  Input,
-  input,
   OnChanges,
   Output,
   SimpleChanges,
   signal,
+  input,
 } from '@angular/core';
-import { Receipt } from '../../../model/receipt';
-import { SavedReceiptCollection, User } from '../../../model/user';
+import { IReceipt } from '../../../model/receipt';
+import { ISavedReceiptCollection, IUser } from '../../../model/user';
 import { ReceiptsService } from '../../../services/receipts.service';
+import { blankFood } from '../../../helpers/constants';
+import { RecipeCreateComponent } from '../recipe-create/recipe-create.component';
 
 @Component({
   selector: 'app-user-receipts',
   standalone: true,
   templateUrl: './user-receipts.component.html',
   styleUrl: './user-receipts.component.scss',
+  imports: [RecipeCreateComponent],
 })
 export class UserReceiptsComponent implements OnChanges {
-  @Input() activeMenu!: string;
-  @Input() menuList: Receipt[] = [];
-  @Input() userSavedReceipts: Receipt[] = [];
-  @Input() userCollections: SavedReceiptCollection[] = [];
-  @Input() clickedFolder: number[] | null = null;
+  activeMenu = input<string>('');
+  menuList = input<IReceipt[]>([]);
+  userSavedReceipts = input<IReceipt[]>([]);
+  userCollections = input<ISavedReceiptCollection[]>([]);
+  clickedFolder = input<number[] | null>(null);
+  user = input.required<IUser>();
+  isOwnPage = input.required<boolean>();
 
-  @Output() folderClicked = new EventEmitter<SavedReceiptCollection>();
+  @Output() folderClicked = new EventEmitter<ISavedReceiptCollection>();
   @Output() clickedFolderChange = new EventEmitter<null>();
-  @Output() navigateToReceipt = new EventEmitter<Receipt>();
-
-  private receiptService = inject(ReceiptsService);
+  @Output() navigateToReceipt = new EventEmitter<IReceipt>();
+  @Output() editReceipt = new EventEmitter<IReceipt>();
 
   // Lokális változók Signal API-val
   selectedFolder = signal<number[] | null>(null);
+
+  /**oldal a mentett recepteknél */
   page = signal<number>(0);
-  list = signal<Receipt[]>([]);
+  list = signal<IReceipt[]>([]);
+
+  blankFood = blankFood;
+
+  private receiptService = inject(ReceiptsService);
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['menuList'] && changes['menuList'].currentValue) {
@@ -51,7 +60,7 @@ export class UserReceiptsComponent implements OnChanges {
     }
   }
 
-  onFolderClick(folder: SavedReceiptCollection) {
+  onFolderClick(folder: ISavedReceiptCollection) {
     if (folder.receipts && folder.receipts.length > 0) {
       this.selectedFolder.set(folder.receipts);
       this.folderClicked.emit(folder);

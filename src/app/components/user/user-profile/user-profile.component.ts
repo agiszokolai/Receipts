@@ -1,25 +1,19 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { UserService } from '../../../services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, Observable, of, single, switchMap, take } from 'rxjs';
-import { SavedReceiptCollection, User } from '../../../model/user';
+import { map, ReplaySubject, switchMap, take, takeUntil } from 'rxjs';
+import { ISavedReceiptCollection, IUser } from '../../../model/user';
 import { ReceiptsService } from '../../../services/receipts.service';
-import { Receipt } from '../../../model/receipt';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { IReceipt } from '../../../model/receipt';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SubMenuItem } from '../../../model/shared';
 import { UserReceiptsComponent } from '../user-receipts/user-receipts.component';
 import { UserDataComponent } from '../user-data/user-data.component';
 import { SearchService } from '../../../services/search.service';
+import { generateSlug } from '../../../helpers/validators';
+import { ToastrService } from 'ngx-toastr';
+import { RecipeCreateComponent } from '../recipe-create/recipe-create.component';
 
 @Component({
   selector: 'app-user-profile',
@@ -30,165 +24,187 @@ import { SearchService } from '../../../services/search.service';
     CommonModule,
     UserReceiptsComponent,
     UserDataComponent,
+    RecipeCreateComponent,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss',
 })
-export class UserProfileComponent implements OnInit {
-  testReceipts = computed(() => {
-    const receipts = this._testReceipts();
-    const searchedText = this.testService.searchedText();
+export class UserProfileComponent implements OnInit, OnDestroy {
+  /** Felhasználói profil */
+  user = signal<IUser | null>(null);
 
-    return;
-  });
+  /** Bejelentkezett felhasználó */
+  activeUser = signal<IUser | null>(null);
 
-  testService = inject(SearchService);
+  /** A profiloldali user receptjei */
+  userReceipts = signal<IReceipt[]>([]);
 
-  _testReceipts: any = signal([]);
+  /** A profiloldali user gyűjteményei */
+  userCollections = signal<ISavedReceiptCollection[]>([]);
 
-  user = signal<User | null>(null);
-  userReceipts = signal<Receipt[]>([]);
-  userCollections = signal<SavedReceiptCollection[]>([]);
-  userFavoriteReceipts = signal<Receipt[]>([]);
+  /** A profiloldali user kedvelt receptjei */
+  userFavoriteReceipts = signal<IReceipt[]>([]);
+
+  /** A profiloldali user által létrehozott receptek össz lájk száma */
   userReceiptsLikes = signal<number>(0);
-  //TODO: ha a saját oldala akkor látszódjanak a mezők
-  customerOwnProfile = signal<boolean>(false);
-  /*   isChangeData = signal<boolean>(false);
-   */ clickedFolder = signal<number[] | null>(null);
 
+  /** A belépett felhasználó saját profilja */
+  customerOwnProfile = signal<boolean>(false);
+
+  /** Kiválasztott gyűjtemény */
+  clickedFolder = signal<number[] | null>(null);
+
+  editedRecipt!: IReceipt | null;
+
+  isDropdownOpen = false;
+  selectedMenuItem: SubMenuItem = new SubMenuItem('Saját receptek', 'own');
+
+  /** Menük */
   readonly menuItems: SubMenuItem[] = [
     new SubMenuItem('Saját receptek', 'own'),
     new SubMenuItem('Kedvenc receptek', 'favorite'),
     new SubMenuItem('Mentett receptek', 'saved'),
   ];
 
-  menuList = signal<Receipt[]>([]);
-  userSavedReceipts = signal<Receipt[]>([]);
+  /** Megjelenített receptek listája */
+  menuList = signal<IReceipt[]>([]);
 
+  /** Felhasználó mentett receptjei */
+  userSavedReceipts = signal<IReceipt[]>([]);
+
+  /** Aktív menü */
   activeMenu = signal<string>('own');
 
-  userForm = new FormGroup({
-    email: new FormControl(''),
-    username: new FormControl(''),
-    name: new FormControl(''),
-    description: new FormControl(''),
-  });
-
-  passwordForm = new FormGroup({
-    password: new FormControl('', Validators.required),
-    passwordConfirm: new FormControl('', [
-      Validators.required,
-      this.passwordConfirmValidator(),
-    ]),
-  });
+  private readonly destroyed$ = new ReplaySubject<void>(1);
 
   private userService = inject(UserService);
   private receiptService = inject(ReceiptsService);
+  private searchService = inject(SearchService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
+  /**
+   * Komponens inicializálása
+   * - Lekéri az URL-ből az `id` paramétert
+   * - Beállítja a belépett felhasználót
+   * - Ha van `id` alapján user, betölti a felhasználói profilt és receptjeit
+   */
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      const id = params['id'];
-      console.log('id', id);
-
-      if (id) {
-        this.getUserProfileAndReceipts(id);
-        this.getUserSavedReeipts();
-      }
+    this.userService.user$.pipe(takeUntil(this.destroyed$)).subscribe((u) => {
+      this.activeUser.set(u);
+      this.getUserData();
     });
-    this.activeMenu.set('own');
-    this.onMenuItemClick('own');
-    console.log(this.user());
+
+    this.searchService.filteredList$.subscribe((filteredList) => {
+      this.menuList.set(filteredList);
+    });
   }
 
-  getUserProfileAndReceipts(userId: number): void {
-    //Lekérdezem a megnyitott felhasználót id alapján
-    this.userService
-      .getUserById(userId)
+  setEditedRecipt(recipe: IReceipt) {
+    console.log('itt');
+
+    this.editedRecipt = recipe;
+  }
+
+  getUserData(): void {
+    this.route.paramMap
       .pipe(
-        switchMap((user) => {
-          //kicserélem a visszaadott értékeket
-          this.user.set(user);
-
-          if (user?.createdReceiptsId && user.createdReceiptsId.length > 0) {
-            //ha van user akkor a létrehozott receptek id-ját kimentem
-            const createdReceiptsIds = user.createdReceiptsId;
-
-            //lekérdezem a recepteket az id-k alapján
-            return this.receiptService
-              .getReceiptsByIds(createdReceiptsIds)
-              .pipe(
-                map((receipts) => ({ user, receipts })) //visszaadom a felhasználót és a receptjeit
-              );
-          }
-          return of({ user, receipts: [] });
+        switchMap((params) => {
+          const username = params.get('username');
+          return this.userService.getUserByUsername(username!);
         }),
-        map(({ user, receipts }) => {
-          //az összes lájk a recepteken
-          let totalLikes = 0;
-          //végigmegyek a megkapott listán
-          receipts.forEach((receipt) => {
-            if (receipt.reviews) {
-              /**
-               * reduce segítségével egy elemmé lehet alakítani a receptek értékeit,
-               * likes-ban a  lájkok össesített értéke van az actualItemben az aktuális recept
-               */
-              totalLikes += receipt.reviews.reduce((likes, actualItem) => {
-                return likes + (actualItem.likes || 0);
-              }, 0);
-            }
-          });
-
-          this.userReceipts.set(receipts); // beállítom a felhaszáó létrehozott receptjeit
-          this._testReceipts.set(receipts);
-          this.userReceiptsLikes.set(totalLikes); //beállítom az összes lájkot a recepteken
-          console.log(user);
-          if (user.savedCollections) {
-            this.userCollections.set(user.savedCollections);
-          }
-
-          //a belépett felhasználó-é e a megnyitott profil
-          /* this.userService
-            .getActiveUser()
-            .pipe(take(1))
-            .subscribe({
-              next: (loggedInUser) => {
-                //visszaadja a belépett user-t és ha van...
-                if (loggedInUser?.userId === user.userId) {
-                  this.customerOwnProfile.set(true);
-                  this.userForm.patchValue({
-                    email: user.email,
-                    username: user.username,
-                    name: user.name,
-                    description: user.description,
-                  });
-                } else {
-                  this.customerOwnProfile.set(false);
-                }
-              },
-              error: (err) =>
-                console.error(
-                  'Hiba történt a bejelentkezett felhasználó lekérése közben:',
-                  err
-                ),
-            }); */
-          const activeUser = this.userService.user$.subscribe();
-          console.log(activeUser);
-        })
       )
-      .subscribe();
+      .subscribe({
+        next: (user) => {
+          if (user) {
+            this.user.set(user);
+            this.customerOwnProfile.set(this.activeUser()?.userId === user.userId);
+
+            this.getUserProfileAndReceipts(user);
+            this.getUserSavedReeipts();
+            this.activeMenu.set('own');
+            this.onMenuItemClick('own');
+          } else {
+            this.router.navigate(['/receptek']); // ha nincs felhasználó visszanavigál a receipts-list-re
+          }
+        },
+        error: (err) => {
+          console.error('Hiba történt a felhasználó betöltésekor', err);
+          this.router.navigate(['/receptek']);
+        },
+      });
   }
 
-  navigateToReceipt(receipt: Receipt): void {
-    this.router.navigate(['/receipt'], {
-      queryParams: { id: receipt.id },
-    });
+  /**
+   * Felhasználó létrehozott receptek lekérése
+   * - Ha van létrehozott recept, lekéri azokat
+   * - Összesíti a recepteken található lájkok számát
+   * - Beállítja a felhasználó receptjeit és a lájkok összegét
+   *
+   * @param {IUser} user - A lekérdezett felhasználó objektuma
+   */
+  getUserProfileAndReceipts(user: IUser): void {
+    if (!user) return;
+
+    if (user.receipts.created && user.receipts.created.length > 0) {
+      //Létrehozott receptek id-jai
+      const createdReceiptsIds = user.receipts.created;
+
+      //Lekérdezem a recepteket
+      this.receiptService
+        .getReceiptsByIds(createdReceiptsIds)
+        .pipe(
+          take(1),
+          map((receipts) => {
+            //az összes lájk a recepteken
+            let totalLikes = 0;
+
+            //végigmegyek a megkapott listán
+            receipts.forEach((receipt) => {
+              if (receipt.reviews) {
+                //
+                // reduce segítségével egy elemmé lehet alakítani a receptek értékeit,
+                // likes-ban a  lájkok össesített értéke van az actualItemben az aktuális recept
+                //
+                totalLikes += receipt.reviews.reduce((likes, actualItem) => {
+                  return likes + (actualItem.likes || 0);
+                }, 0);
+              }
+            });
+
+            this.userReceipts.set(receipts); // beállítom a felhaszáló létrehozott receptjeit
+            this.userReceiptsLikes.set(totalLikes); //beállítom az összes lájkot a recepteken
+          }),
+        )
+        .subscribe();
+    } else {
+      this.userReceipts.set([]);
+      this.userReceiptsLikes.set(0);
+    }
+
+    if (user.receipts.collections) {
+      this.userCollections.set(user.receipts.collections);
+    }
   }
 
+  /**
+   * Navigálás egy adott receptre
+   * - A recept `id` paraméterével átirányítja a felhasználót a megfelelő oldalra
+   *
+   * @param {IReceipt} receipt - A navigálandó recept objektuma
+   */
+  navigateToReceipt(receipt: IReceipt): void {
+    this.router.navigate(['/recept', generateSlug(receipt.name)]);
+  }
+
+  /**
+   * A profilon lévő felhasználó  mentett receptjeinek lekérése
+   * - Lekéri a mentett recepteket az API-ból és beállítja őket
+   */
   getUserSavedReeipts() {
     this.receiptService
-      .getReceiptsByIds(this.user()!.savedReceipts)
+      .getReceiptsByIds(this.user()!.receipts.saved)
       .pipe(take(1))
       .subscribe({
         next: (r) => {
@@ -197,20 +213,28 @@ export class UserProfileComponent implements OnInit {
       });
   }
 
+  /**
+   * Menüválasztás
+   * - Az aktuális menüpont alapján beállítja a megfelelő listát és keresési adatokat
+   *
+   * @param {string} item - A menüpont, amelyre kattintottak ('own', 'favorite', 'saved')
+   */
   onMenuItemClick(item: string) {
     switch (item) {
       case 'own':
         this.menuList.set(this.userReceipts());
         this.activeMenu.set('own');
         this.clickedFolder.set(null);
+        this.searchService.setOriginalList(this.userReceipts());
         break;
-      case 'favorite':
+      case 'favorite': {
         const user = this.user();
-        if (user?.likedReceipts) {
-          const likedReceiptsIds = user.likedReceipts;
+        if (user?.receipts.liked) {
+          const likedReceiptsIds = user.receipts.liked;
           this.receiptService.getReceiptsByIds(likedReceiptsIds).subscribe({
             next: (receipts) => {
               this.menuList.set(receipts);
+              this.searchService.setOriginalList(receipts);
             },
             error: (err) => {
               console.error('Error fetching liked receipts:', err);
@@ -221,23 +245,43 @@ export class UserProfileComponent implements OnInit {
         this.activeMenu.set('favorite');
 
         break;
+      }
       case 'saved':
         /*  this.menuList.set(this.userCollections()); */
         this.menuList.set([]);
         this.activeMenu.set('saved');
+        this.searchService.setOriginalList(this.userCollections());
 
         break;
     }
-    console.log(this.menuList());
   }
 
-  onFolderClick(folder: SavedReceiptCollection) {
+  toggleDropdown(): void {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  onDropdownMenuItemClick(menuName: string): void {
+    this.selectedMenuItem =
+      this.menuItems.find((item) => item.name === menuName) || new SubMenuItem('', '');
+    this.onMenuItemClick(menuName);
+
+    this.isDropdownOpen = false; // Bezárás kattintás után
+  }
+
+  /**
+   * Mappa (mappára kattintás)
+   * - A kiválasztott mappa tartalmát lekérdezi és beállítja a menü listáját
+   *
+   * @param {ISavedReceiptCollection} folder - A kattintott mappa objektuma
+   */
+  onFolderClick(folder: ISavedReceiptCollection) {
     if (folder.receipts && folder.receipts.length > 0) {
       this.clickedFolder.set(folder.receipts);
 
       this.receiptService.getReceiptsByIds(folder.receipts).subscribe({
         next: (receipts) => {
           this.menuList.set(receipts);
+          this.searchService.setOriginalList(receipts);
         },
         error: (err) => console.error('Error fetching folder receipts:', err),
       });
@@ -246,23 +290,53 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
-  passwordConfirmValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!control.parent) return null;
-      const password = control.parent.get('password')?.value;
-      const passwordConfirm = control.value;
-
-      return password !== passwordConfirm ? { passwordConfirm: true } : null;
-    };
+  createReceipt(data: any): void {
+    this.receiptService.createReceipt(data).subscribe({
+      next: (createdReceipt) => {
+        if (createdReceipt) {
+          this.userReceipts.set([...this.userReceipts(), createdReceipt]);
+        }
+        this.onMenuItemClick('own');
+        this.toastr.success('Recept sikeresen létrehozva');
+      },
+      error: (err) => {
+        console.error('Hiba a recept létrehozásakor', err);
+      },
+    });
   }
 
-  emailValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const emailRegEx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!control.value) {
-        return null;
-      }
-      return emailRegEx.test(control.value) ? null : { invalidEmail: true };
-    };
+  updateRecipe(data: any): void {
+    console.log('recept:', data);
+    this.receiptService.updateReceipt(data).subscribe({
+      next: (updatedReceipt) => {
+        const currentList = [...this.userReceipts()];
+
+        // 🔹 Megkeressük a frissítendő recept indexét
+        if (updatedReceipt) {
+          const updatedIndex = currentList.findIndex((r) => r.id === updatedReceipt.id);
+
+          if (updatedIndex !== -1) {
+            // 🔹 Lecseréljük az adott receptet az új verzióra
+            currentList[updatedIndex] = { ...updatedReceipt };
+
+            // 🔹 Signal beállítása teljesen új tömbbel (hogy biztosan érzékelje a változást)
+            this.userReceipts.set([...currentList]);
+            this.onMenuItemClick('own');
+
+            console.log('✅ Új receptlista:', this.userReceipts());
+            this.toastr.success('Recept sikeresen frissítve!');
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Hiba a recept frissítésekor', err);
+        this.toastr.error('Hiba történt a recept frissítésekor!');
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 }

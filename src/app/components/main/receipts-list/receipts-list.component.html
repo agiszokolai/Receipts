@@ -1,35 +1,48 @@
 <div class="view-toggle">
   <button (click)="toggleViewMode()">
-    Nézet
-
     <i
       class="fa-solid"
       [ngClass]="{
         'fa-border-all': viewMode === 'list',
-        'fa-list': viewMode === 'grid'
+        'fa-list': viewMode === 'grid',
       }"
     ></i>
   </button>
 </div>
 <!-- Kártyás nézet (grid) -->
-@if(viewMode === 'grid'){
-<div class="grid" [appFadeSwitch]="fadeSwitchState">
-  @for (receipt of filteredList; track receipt.id){
-  <div class="col">
-    <app-receipt-card [receipt]="receipt" [user]="user()!"></app-receipt-card>
+@if (viewMode === "grid") {
+  <div appFade>
+    <div class="grid">
+      @for (receipt of filteredList; track receipt.id) {
+        <div class="col">
+          <app-receipt-card
+            [receipt]="receipt"
+            [user]="user()!"
+            [likedByUser]="isLikedByUser(receipt.id)"
+            [saveddByUser]="isSavedByUser(receipt.id)"
+            (likedChange)="handleLikedChange($event)"
+            (savedChange)="handleSavedChange($event)"
+          ></app-receipt-card>
+        </div>
+      }
+    </div>
   </div>
-  }
-</div>
-}@else {
-<!-- Lista nézet  -->
-<div class="list" [appFadeSwitch]="fadeSwitchState">
-  @for (receipt of filteredList; track receipt.id){
-  <div class="list-item">
-    <app-receipt-list-item
-      [receipt]="receipt"
-      [user]="user()!"
-    ></app-receipt-list-item>
+} @else {
+  <!-- Lista nézet  -->
+  <div appFade>
+    <div class="list">
+      @for (receipt of filteredList; track receipt.id) {
+        <div class="list-item">
+          <app-receipt-list-item
+            [receipt]="receipt"
+            [user]="user()!"
+            [likedByUser]="isLikedByUser(receipt.id)"
+            [saveddByUser]="isSavedByUser(receipt.id)"
+            (likedChange)="handleLikedChange($event)"
+            (savedChange)="handleSavedChange($event)"
+          ></app-receipt-list-item>
+        </div>
+      }
+    </div>
   </div>
-  }
-</div>
 }

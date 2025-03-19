@@ -1,189 +1,118 @@
-<div class="navbar">
-  <div class="search">
-    <i class="fa-solid fa-search ps-1 pe-2"></i>
-    <input
-      type="text"
-      placeholder="Keresés"
-      [(ngModel)]="searchText"
-      (input)="onSearchChange()"
-    />
-  </div>
-
-  <div class="custom-select ps-3">
-    <div class="custom-select-input" (click)="isDropdownOpen = !isDropdownOpen">
-      <div class="text-container">
-        {{
-          selectedCategories.length > 0
-            ? formatSelectedCategory(selectedCategories)
-            : "Kategória"
-        }}
-      </div>
-      <div class="icon-container">
-        <i
-          class="fa-solid"
-          [ngClass]="{
-            'fa-sort-up': !isDropdownOpen,
-            'fa-sort-down': isDropdownOpen
-          }"
-        ></i>
-      </div>
-    </div>
-    <div class="custom-dropdown-menu" *ngIf="isDropdownOpen">
-      <ul>
-        @for(category of categoryEnum; track $index){
-        <li
-          [ngClass]="{ 'active-item': selectedCategories.includes(category) }"
-          (click)="onCategoryChange(category)"
-        >
-          {{ category }}
-        </li>
-        }
-      </ul>
-    </div>
-  </div>
-  <div class="user-icon" (click)="isUserMenuOpen.set(!isUserMenuOpen())">
-    <i class="fa-regular fa-circle-user"></i>
-  </div>
-
-  @if(isUserMenuOpen()){
-  <div class="user-menu">
-    @if(user()){ @if(user()?.profilePictureUrl){
-    <div class="user-photo"><img [src]="user()?.profilePictureUrl" /></div>
-    }
-    <p>
-      <strong>{{ user()?.name }}</strong>
-    </p>
-    <p>&#64;{{ user()?.username }}</p>
-    <button (click)="openUserPage()">Profil</button>
-    <button (click)="logout()">Kijelentkezés</button>
-    }@else {
-    <button
-      (click)="
-        isLoginModalOpen.set(!isLoginModalOpen());
-        isRegistrationModalOpen.set(false)
-      "
-    >
-      Bejelentkezés
-    </button>
-    <button
-      (click)="
-        isRegistrationModalOpen.set(!isRegistrationModalOpen());
-        isLoginModalOpen.set(false)
-      "
-    >
-      Regisztráció
-    </button>
-    }
-  </div>
-  }
-</div>
-
-<app-modal
-  [isModalVisible]="isLoginModalOpen()"
-  [formName]="'logInForm'"
-  [size]="'small'"
-  [header]="'Bejelentkezés'"
-  [footerButtonLabel]="'Bejelentkezés'"
-  [isFooterCancelVisible]="true"
-  (closeEvent)="closeModal()"
-  (logInEvent)="logIn($event)"
-></app-modal>
-<app-modal
-  [isModalVisible]="isRegistrationModalOpen()"
-  [formName]="'registrationForm'"
-  [size]="'medium'"
-  [header]="'Regisztráció'"
-  [footerButtonLabel]="'Regisztráció'"
-  [isFooterCancelVisible]="true"
-  (closeEvent)="closeModal()"
-  (registrationEvent)="registration($event)"
-></app-modal>
-
-<!-- @if(isLoginModalOpen()){
-<div class="modal-backdrop" (click)="isLoginModalOpen.set(false)"></div>
-<div class="login-modal small">
-  <form
-    [formGroup]="logInForm"
-    (ngSubmit)="logIn()"
-    class="login-modal-content"
+<div class="custom-navbar">
+  <div
+    class="logo-container"
+    (click)="navigateToLandingPage()"
+    (keydown)="navigateToLandingPage()"
+    tabindex="0"
   >
-    <h2>Bejelentkezés</h2>
-
-    <div class="custom-input">
-      <input type="email" formControlName="email" placeholder="Email cím" />
-
-      <input type="password" formControlName="password" placeholder="Jelszó" />
-    </div>
-
-    <div class="buttons">
-      <button type="submit" [disabled]="logInForm.invalid">
-        Bejelentkezés
-      </button>
-      <button type="button" (click)="isLoginModalOpen.set(false)">Mégse</button>
-    </div>
-  </form>
-</div>
-} @if(isRegistrationModalOpen()){
-<div class="modal-backdrop" (click)="isRegistrationModalOpen.set(false)"></div>
-<div class="login-modal medium">
-  <form
-    [formGroup]="registrationForm"
-    (ngSubmit)="registration()"
-    class="login-modal-content"
-  >
-    <h2>Regisztráció</h2>
-
-    <div class="custom-input">
-      <input type="email" formControlName="email" placeholder="Email cím" />
-      <input type="text" formControlName="name" placeholder="Név" />
+    <img class="logo" src="../../../../assets/images/logo.svg" alt="" />
+    <span>FoodShare</span>
+  </div>
+  <div class="search-select">
+    <div class="custom-search">
+      <i class="fa-solid fa-search ps-1 pe-2"></i>
       <input
         type="text"
-        formControlName="username"
-        placeholder="Felhasználónév"
-      />
-      <input type="password" formControlName="password" placeholder="Jelszó" />
-      <input
-        type="password"
-        formControlName="passwordConfirm"
-        placeholder="Jelszó megerősítése"
+        placeholder="Keresés"
+        [(ngModel)]="searchText"
+        (input)="onSearchChange()"
+        (ngModelChange)="onSearchChange()"
       />
     </div>
 
-    <div class="buttons">
-      <button type="submit" [disabled]="registrationForm.invalid">
-        Regisztráció
-      </button>
-      <button type="button" (click)="isRegistrationModalOpen.set(false)">
-        Mégse
-      </button>
+    <!-- TODO: ha  a recept oldalán van akkor ezek kellenek-e? -->
+    <div class="custom-select ps-3">
+      <div
+        class="custom-select-input"
+        [ngClass]="{ active: isDropdownOpen }"
+        (click)="isDropdownOpen = !isDropdownOpen"
+        (keyup)="isDropdownOpen = !isDropdownOpen"
+        tabindex="0"
+      >
+        <div class="text-container">
+          {{
+            selectedCategories.length > 0 ? formatSelectedCategory(selectedCategories) : "Kategória"
+          }}
+        </div>
+        <div class="icon-container">
+          <i
+            class="fa-solid"
+            [ngClass]="{
+              'fa-sort-up': !isDropdownOpen,
+              'fa-sort-down': isDropdownOpen,
+            }"
+          ></i>
+        </div>
+      </div>
+      <div class="custom-dropdown-menu" *ngIf="isDropdownOpen">
+        <ul>
+          @for (category of categoryEnum; track $index) {
+            <li
+              [ngClass]="{ 'active-item': selectedCategories.includes(category) }"
+              (click)="onChangeCategoryClick(category)"
+              (keyup)="onChangeCategoryClick(category)"
+              tabindex="0"
+            >
+              {{ category }}
+            </li>
+          }
+        </ul>
+      </div>
     </div>
-  </form>
+  </div>
+
+  <div
+    class="user-icon"
+    (click)="isUserMenuOpen.set(!isUserMenuOpen())"
+    (keyup)="isUserMenuOpen.set(!isUserMenuOpen())"
+    tabindex="0"
+  >
+    @if (!user()) {
+      <i class="fa-regular fa-circle-user"></i>
+    } @else {
+      <div class="user-photo">
+        <img [src]="user()?.profilePictureUrl" [alt]="user()?.name" />
+      </div>
+    }
+  </div>
+
+  @if (isUserMenuOpen()) {
+    <div class="user-menu">
+      @if (user()) {
+        @if (user()?.profilePictureUrl) {
+          <div class="user-photo">
+            <img [src]="user()?.profilePictureUrl" [alt]="user()?.name" />
+          </div>
+        }
+        <p>
+          <strong>{{ user()?.name }}</strong>
+        </p>
+        <p>&#64;{{ user()?.username }}</p>
+        <button (click)="openUserPage()">Profil</button>
+        <button (click)="logout()">Kijelentkezés</button>
+      } @else {
+        <button
+          (click)="isLoginModalOpen.set(!isLoginModalOpen()); isRegistrationModalOpen.set(false)"
+        >
+          Bejelentkezés
+        </button>
+        <button
+          (click)="
+            isRegistrationModalOpen.set(!isRegistrationModalOpen()); isLoginModalOpen.set(false)
+          "
+        >
+          Regisztráció
+        </button>
+      }
+    </div>
+  }
 </div>
-} -->
-
-<!-- <app-modal
-  [size]="'small'"
-  [isModalVisible]="isLoginModalOpen()"
-  [header]="'Bejelentkezés'"
-  [formContent]="{
-    form: logInForm,
-   
-  }"
-  [isFooterCancelVisible]="true"
-  [footerButtonLabel]="'Bejelentkezés'"
-  (closeEvent)="closeModal()"
-  (submitEvent)="logIn()"
-></app-modal> -->
-
-<!-- <app-modal
-  [size]="'medium'"
-  [isModalVisible]="isRegistrationModalOpen()"
-  [header]="'Regisztráció'"
-  [formContent]="{
-    form: registrationForm,
-   
-  }"
-  [isFooterCancelVisible]="true"
-  [footerButtonLabel]="'Bejelentkezés'"
-  (closeEvent)="closeModal()"
-></app-modal> -->
+@if (isLoginModalOpen()) {
+  <app-login [isLoginModalOpen]="isLoginModalOpen()" (closeEvent)="closeModal()"></app-login>
+}
+@if (isRegistrationModalOpen()) {
+  <app-registration
+    [isRegistrationModalOpen]="isRegistrationModalOpen()"
+    (closeEvent)="closeModal()"
+  ></app-registration>
+}

@@ -1,65 +1,42 @@
-export interface Receipt {
+import { DifficultyEnum, UnitEnum } from '../helpers/constants';
+
+export interface IReceipt {
   id: number;
   name: string;
-  description?: string;
-  ingredients: Ingredient[];
+  description: string;
+  ingredients: IIngredientSection[];
   steps: string[];
-  prepTime?: number;
+  prepTime: number;
   cookingTime?: number;
-  servings?: number;
-  difficulty?: DifficultyEnum;
-  category?: CategoryEnum[] | string[];
-  tags?: string[];
-  imageUrl: string;
-  nutrition?: Nutrition;
-  nutritionPerServing?: Nutrition;
+  servings: number;
+  difficulty: DifficultyEnum;
+  category: string;
+  tags: string[];
+  imageUrl?: string;
+  nutrition?: INutrition;
+  nutritionPerServing?: INutrition;
   createdAt: string;
   createdById: number;
-  reviews?: Review[];
-  averageRating?: number;
+  reviews?: IReview[] | null;
+  averageRating: number;
+  likes: number;
+  saves: number;
+}
+export interface IIngredientSection {
+  sectionName: string; // Pl. "Tészta", "Krém", "Máz"
+  ingredients: IIngredient[]; // Az adott szekcióhoz tartozó hozzávalók
 }
 
-export interface Ingredient {
+export interface IIngredient {
   id: number;
   name: string;
   amount: number;
-  unit: UnitEnum;
+  unit: UnitEnum | string;
   optional?: boolean;
-  nutrition?: Nutrition;
+  nutrition?: INutrition;
 }
 
-export enum DifficultyEnum {
-  Easy = 'easy',
-  Medium = 'medium',
-  Hard = 'hard',
-}
-
-export enum UnitEnum {
-  Ml = 'ml', // milliliter
-  L = 'l', // liter
-  G = 'g', // gramm
-  Dkg = 'dkg', // dekagramm
-  Kg = 'kg', // kilogramm
-  Dl = 'dl', // deciliter
-  Tbsp = 'tbsp', // evőkanál
-  Tsp = 'tsp', // teáskanál
-  Sp = 'sp', // evőkanál
-  Cup = 'cup', // csésze
-  Pinch = 'pinch', // csipet
-  Dash = 'dash', // egy kevés
-  Pcs = 'pcs', // darab
-  Slice = 'slice', // szelet
-  Pack = 'pack', // csomag
-  Can = 'can', // konzerv
-  Bunch = 'bunch', // csokor (pl. petrezselyem)
-  Head = 'head', // fej
-  Stick = 'stick', // rúd
-  Clove = 'clove', // gerezd
-  Sheet = 'sheet', // lap (pl. réteslap)
-  ToTaste = 'to taste', // ízlés szerint
-}
-
-export interface Nutrition {
+export interface INutrition {
   calories: number;
   protein?: number;
   carbs?: number;
@@ -68,34 +45,14 @@ export interface Nutrition {
   sugar?: number;
 }
 
-export enum CategoryEnum {
-  Breakfast = 'breakfast',
-  Lunch = 'lunch',
-  Dinner = 'dinner',
-  Dessert = 'dessert',
-  Soup = 'soup',
-  Salad = 'salad',
-  Appetizer = 'appetizer',
-  SideDish = 'side dish',
-  MainCourse = 'main-course',
-  Snack = 'snack',
-  Drink = 'drink',
-  Vegan = 'vegan',
-  Vegetarian = 'vegetarian',
-  GlutenFree = 'gluten-free',
-  LowCarb = 'low-carb',
-  HighProtein = 'high-protein',
-  Holiday = 'holiday',
-  QuickEasy = 'quick & easy',
-  Healthy = 'healthy',
-  Spicy = 'spicy',
-}
-
-export interface Review {
-  userId: number;
+//TODO: ezt átgondolni
+export interface IReview {
+  id: number;
+  userId: string;
   username: string;
-  likes?: number;
+  likes: number | null;
   rating: number;
-  comment?: string;
+  comment: string | null;
   createdAt: string;
+  updatedAt?: string | null;
 }

@@ -1,87 +1,91 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
-import { Receipt } from '../../../../model/receipt';
+import { Component, EventEmitter, inject, input, OnInit, Output } from '@angular/core';
+import { IReceipt } from '../../../../model/receipt';
 import { CommonModule } from '@angular/common';
-import { User } from '../../../../model/user';
-import { UserService } from '../../../../services/user.service';
+import { IUser } from '../../../../model/user';
 import { Router } from '@angular/router';
+import { generateSlug } from '../../../../helpers/validators';
+import { AuthenticationWarningModalComponent } from '../../../shared/modal/authentication-warning-modal/authentication-warning-modal.component';
+import { blankFood } from '../../../../helpers/constants';
 
 @Component({
   selector: 'app-receipt-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AuthenticationWarningModalComponent],
   templateUrl: './receipt-card.component.html',
   styleUrl: './receipt-card.component.scss',
 })
 export class ReceiptCardComponent implements OnInit {
-  receipt = input.required<Receipt>();
-  user = input<User>();
+  /* Aktuális recept */
+  receipt = input.required<IReceipt>();
 
-  isLiked = signal(false);
-  isSaved = signal(false);
-  isHoveredBookMark = signal(false);
-  isHoveredHeart = signal(false);
+  /* Belépett felhasználó */
+  user = input<IUser>();
 
-  private userService = inject(UserService);
+  /* Kedvelve van-e a felhasználó által */
+  likedByUser = input.required<boolean>();
+
+  /* Mentve van-e a felhasználó által */
+  saveddByUser = input.required<boolean>();
+
+  /** Esemény, amely értesíti a szülő komponenst a kedvelési állapot változásáról */
+  @Output() likedChange = new EventEmitter<{
+    receiptId: number;
+    liked: boolean;
+  }>();
+
+  /** Esemény, amely értesíti a szülő komponenst a mentési állapot változásáról */
+  @Output() savedChange = new EventEmitter<{
+    receiptId: number;
+    saved: boolean;
+  }>();
+
+  isModalOpen = false;
+  isLoginModalOpen = false;
+  isRegistrationModalOpen = false;
+
+  /** A kedvelés ikon hover állapota */
+  isHeartHovered = false;
+
+  /** A mentés ikon hover állapota */
+  isBookMarkHovered = false;
+
+  blankFood = blankFood;
+
   private router = inject(Router);
 
   ngOnInit(): void {
-    this.isLikedByUser();
-    this.isSavedByUser();
+    this.receipt().imageUrl = this.receipt().imageUrl?.length ? this.receipt().imageUrl : blankFood;
   }
-
-  isLikedByUser(): void {
-    this.isLiked.set(
-      this.user()?.likedReceipts?.includes(this.receipt().id) ?? false
-    );
-  }
-
-  setReceiptToLiked(liked: boolean): void {
-    if (liked) {
-      this.userService.addLikedReceipt(this.receipt().id).subscribe({
-        next: (r) => {
-          this.isLiked.set(true);
-        },
-        error: (err) => {
-          console.log('error');
-        },
-      });
-    } else {
-      this.userService.removeLikedReceipt(this.receipt().id).subscribe({
-        next: (r) => {
-          this.isLiked.set(false);
-        },
-      });
+  /**
+   * Beállítja a recept mentett állapotát és értesíti a szülő komponenst
+   *
+   * @param {IReceipt} receipt - Az aktuális recept
+   * @param {boolean} saved - A mentési állapot (true = mentett, false = nem mentett)
+   */
+  onSavedClick(receipt: IReceipt, saved: boolean): void {
+    if (!this.user()) {
+      this.isModalOpen = true;
     }
+    this.savedChange.emit({ receiptId: receipt.id, saved: saved });
   }
 
-  isSavedByUser(): void {
-    this.isSaved.set(
-      this.user()?.savedReceipts?.includes(this.receipt().id) ?? false
-    );
-  }
-
-  setReceiptToSaved(saved: boolean): void {
-    if (saved) {
-      this.userService.addSavedReceipt(this.receipt().id).subscribe({
-        next: (r) => {
-          this.isSaved.set(true);
-        },
-        error: (err) => {
-          console.log('error');
-        },
-      });
-    } else {
-      this.userService.removeSavedReceipt(this.receipt().id).subscribe({
-        next: (r) => {
-          this.isSaved.set(false);
-        },
-      });
+  /**
+   * Beállítja a recept kedvelt állapotát és értesíti a szülő komponenst
+   *
+   * @param {IReceipt} receipt - Az aktuális recept
+   * @param {boolean} liked - A kedvelési állapot (true = kedvelt, false = nem kedvelt)
+   */
+  onLikedClick(receipt: IReceipt, liked: boolean): void {
+    if (!this.user()) {
+      this.isModalOpen = true;
     }
+    this.likedChange.emit({ receiptId: receipt.id, liked: liked });
   }
 
+  /**
+   * Átnavigál a recept oldalára
+   */
   navigateToReceipt(): void {
-    this.router.navigate(['/receipt'], {
-      queryParams: { id: this.receipt().id },
-    });
+    this.router.navigate(['/recept', generateSlug(this.receipt().name)]);
   }
 }

@@ -1,0 +1,136 @@
+<div class="custom-navbar">
+  <div class="navbar-left">
+    <div
+      class="logo"
+      class="logo-container"
+      (click)="navigateToLandingPage()"
+      (keydown)="navigateToLandingPage()"
+      tabindex="0"
+    >
+      <img class="logo" src="../../../../assets/images/logo.svg" alt="" />
+      <span class="ms-1" [ngClass]="{ active: activePage === '/' }">FoodShare</span>
+    </div>
+
+    <div
+      class="receipts-navigation mx-3"
+      (click)="navigateToReceipts()"
+      (keydown)="navigateToReceipts()"
+      tabindex="0"
+    >
+      <span [ngClass]="{ active: activePage === '/receptek' }">Receptek</span>
+    </div>
+
+    <div class="search-select">
+      <div
+        class="custom-search"
+        [ngClass]="{ expanded: isSearchActive || isSearchDropdownVisible }"
+      >
+        <i
+          class="search-icon fa-solid fa-search ps-1 pe-2"
+          (click)="isSearchActive = !isSearchActive"
+          (keyup)="isSearchActive = !isSearchActive"
+          tabindex="0"
+        ></i>
+        @if (isSearchActive) {
+          <input
+            type="text"
+            placeholder="Keresés"
+            [(ngModel)]="searchService.searchData().searchText"
+            (ngModelChange)="onSearchChange()"
+          />
+        }
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="user-icon"
+    (click)="isUserMenuOpen.set(!isUserMenuOpen())"
+    (keyup)="isUserMenuOpen.set(!isUserMenuOpen())"
+    tabindex="0"
+  >
+    @if (!user()) {
+      <i class="fa-regular fa-circle-user"></i>
+    } @else {
+      <div class="user-photo">
+        <img [src]="user()?.profilePictureUrl" [alt]="user()?.name" />
+      </div>
+    }
+  </div>
+
+  @if (isUserMenuOpen()) {
+    <div class="user-menu">
+      @if (user()) {
+        @if (user()?.profilePictureUrl) {
+          <div class="user-photo">
+            <img [src]="user()?.profilePictureUrl" [alt]="user()?.name" />
+          </div>
+        }
+        <p>
+          <strong>{{ user()?.name }}</strong>
+        </p>
+        <p>&#64;{{ user()?.username }}</p>
+        <button (click)="openUserPage()">Profil</button>
+        <button (click)="logout()">Kijelentkezés</button>
+      } @else {
+        <button
+          (click)="isLoginModalOpen.set(!isLoginModalOpen()); isRegistrationModalOpen.set(false)"
+        >
+          Bejelentkezés
+        </button>
+        <button
+          (click)="
+            isRegistrationModalOpen.set(!isRegistrationModalOpen()); isLoginModalOpen.set(false)
+          "
+        >
+          Regisztráció
+        </button>
+      }
+    </div>
+  }
+
+  @if (isSearchDropdownVisible) {
+    <div class="custom-modal-backdrop"></div>
+    <div class="search-results">
+      @if (filterdReceipts$ | async; as receipts) {
+        @if (receipts.length) {
+          @for (receipt of receipts.slice(0, 3); track receipt.id) {
+            <div
+              class="search-item"
+              tabindex="0"
+              (click)="navigateToReceipt(receipt)"
+              (keyup)="navigateToReceipt(receipt)"
+              tabindex="0"
+            >
+              <img [src]="receipt.imageUrl" alt="" srcset="" />
+              <span>{{ receipt.name }}</span>
+            </div>
+          }
+          @if (receipts.length > 3) {
+            <div
+              class="more-results"
+              (click)="navigateToReceipts()"
+              (keyup)="navigateToReceipts()"
+              tabindex="0"
+            >
+              <span>További receptek</span>
+            </div>
+          }
+        } @else {
+          <div class="search-item blank" tabindex="0">
+            <span>Nincs a keresésnek megfelelő recept</span>
+          </div>
+        }
+      }
+    </div>
+  }
+</div>
+@if (isLoginModalOpen()) {
+  <app-login [isLoginModalOpen]="isLoginModalOpen()" (closeEvent)="closeModal()"></app-login>
+}
+@if (isRegistrationModalOpen()) {
+  <app-registration
+    [isRegistrationModalOpen]="isRegistrationModalOpen()"
+    (closeEvent)="closeModal()"
+  ></app-registration>
+}

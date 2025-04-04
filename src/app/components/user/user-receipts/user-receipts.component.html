@@ -1,0 +1,126 @@
+<div class="menu">
+  <div class="menu-dropdown">
+    <div class="custom-select">
+      <div
+        class="custom-select-input"
+        [ngClass]="{ active: isDropdownOpen }"
+        (click)="toggleDropdown()"
+        (keyup.enter)="toggleDropdown()"
+        tabindex="0"
+      >
+        <div class="text-container">
+          {{ selectedMenuItem ? selectedMenuItem.label : "Menü kiválasztása" }}
+        </div>
+        <div class="icon-container">
+          <i
+            class="fa-solid"
+            [ngClass]="{
+              'fa-sort-up': isDropdownOpen,
+              'fa-sort-down': !isDropdownOpen,
+            }"
+          ></i>
+        </div>
+        <div class="custom-dropdown-menu recipe-menu" *ngIf="isDropdownOpen">
+          <ul>
+            @for (item of menuItems; track item.name) {
+              <li
+                [ngClass]="{ 'active-item': item.name === activeMenu() }"
+                (click)="onDropdownMenuItemClick(item.name)"
+                tabindex="0"
+                (keyup)="onDropdownMenuItemClick(item.name)"
+              >
+                {{ item.label }}
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="menu-buttons">
+    @for (item of menuItems; track item.name) {
+      <button
+        type="button"
+        (click)="onMenuItemClick(item.name)"
+        [ngClass]="{ active: item.name === activeMenu() }"
+      >
+        {{ item.label }}
+      </button>
+    }
+  </div>
+</div>
+@if (savedViewMode() !== "saved" && activeMenu() === "saved") {
+  <div class="back-button">
+    <button type="button" (click)="onNavigateBackSavedReceipts()">Vissza</button>
+  </div>
+}
+<div class="receipts">
+  @if (activeMenu() === "saved") {
+    <div class="folders mt-4" *ngIf="savedViewMode() === 'saved'">
+      <div class="folder-card" (click)="showCollections()" (keyup)="showCollections()" tabindex="0">
+        <i class="fa-regular fa-folder"></i>
+        <p>Gyűjtemények</p>
+      </div>
+    </div>
+
+    <div class="folders" *ngIf="savedViewMode() === 'collections'">
+      @for (folder of collectionsList(); track folder.id) {
+        <div
+          class="folder-card"
+          (click)="openCollection(folder)"
+          (keyup)="openCollection(folder)"
+          tabindex="0"
+        >
+          <i class="fa-regular fa-folder"></i>
+          <p>{{ folder.name }}</p>
+        </div>
+      }
+    </div>
+  }
+
+  @if (savedViewMode() !== "collections" || activeMenu() !== "saved") {
+    @for (receipt of receiptList(); track receipt.id) {
+      <div class="receipt-card">
+        <div
+          class="img-container"
+          (click)="navigateToReceipt(receipt)"
+          (keyup)="navigateToReceipt(receipt)"
+          tabindex="0"
+        >
+          <img
+            class="fixed-img"
+            [src]="receipt.imageUrl ? receipt.imageUrl : blankFood"
+            alt="{{ receipt.name }}"
+          />
+        </div>
+
+        <div class="name-container">
+          @if (activeMenu() === "own" && isOwnPage()) {
+            <i
+              class="fa-solid fa-pen-to-square"
+              (click)="editModalOpen = true; editedRecipe = receipt"
+              tabindex="0"
+              (keyup)="editModalOpen = true; editedRecipe = receipt"
+            ></i>
+          }
+          <p
+            class="mt-2"
+            (click)="navigateToReceipt(receipt)"
+            (keyup)="navigateToReceipt(receipt)"
+            tabindex="0"
+          >
+            {{ receipt.name }}
+          </p>
+        </div>
+      </div>
+    }
+  }
+</div>
+@if (editModalOpen) {
+  <app-recipe-create
+    [user]="user()!"
+    [existingReceipt]="editedRecipe"
+    (updateEvent)="editReceipt($event)"
+    (closeEvent)="editModalOpen = false"
+  ></app-recipe-create>
+}

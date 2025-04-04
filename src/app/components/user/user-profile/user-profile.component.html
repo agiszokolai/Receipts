@@ -1,0 +1,15 @@
+<div class="profile-container">
+  <div class="left col-lg-3 col-md-4 col-sm-12">
+    <app-user-data
+      [user]="userProfile()!"
+      [userReceiptsLikes]="userReceiptsLikes()"
+      [customerOwnProfile]="customerOwnProfile()"
+      (createEvent)="createReceipt($event)"
+    >
+    </app-user-data>
+  </div>
+  <div class="right col-lg-9 col-md-8 col-sm-12">
+    <app-user-receipts [user]="userProfile()!" [isOwnPage]="customerOwnProfile()">
+    </app-user-receipts>
+  </div>
+</div>

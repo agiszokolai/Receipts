@@ -1,0 +1,273 @@
+<app-modal
+  [isModalVisible]="isCreateReceipt() || isExistingRecipe()"
+  [size]="'large'"
+  [header]="'Recept létrehozása'"
+  [footerButtonLabel]="'Létrehozás'"
+  [isFooterCancelVisible]="true"
+  [formGroup]="receipeForm"
+  [formTemplate]="createReceipt"
+  (submitEvent)="onSubmit()"
+  (closeEvent)="onClose()"
+></app-modal>
+
+<ng-template #createReceipt>
+  <form [formGroup]="receipeForm" class="receipt-form h-100" (submit)="onSubmit()">
+    <div class="form-group align-self-end">
+      <input id="receiptName" formControlName="receiptName" type="text" placeholder=" " />
+      <label for="receiptName">Recept neve:</label>
+    </div>
+
+    <div class="form-group">
+      <textarea
+        id="description"
+        formControlName="description"
+        placeholder=" "
+        [rows]="4"
+      ></textarea>
+      <label for="description">Leírás:</label>
+    </div>
+
+    <div class="ingredients-container">
+      <h3>Hozzávalók</h3>
+      <div class="ingredients" formArrayName="ingredients">
+        @for (section of sections.controls; track section; let i = $index) {
+          <div [formGroupName]="i">
+            @if (section) {
+              <div class="d-flex align-items-center">
+                <div class="section-header form-group col-6">
+                  <input formControlName="sectionName" />
+                  <label for="sectionName">Szekció neve:</label>
+                </div>
+                <i
+                  class="fa-solid fa-trash"
+                  (click)="removeSection(i)"
+                  tabindex="0"
+                  (keyup)="removeSection(i)"
+                ></i>
+              </div>
+            }
+
+            <div formArrayName="ingredients" class="mb-3">
+              @for (ingredient of ingredients(i).controls; track ingredient; let j = $index) {
+                <div [formGroupName]="j">
+                  <div class="ingredient-row form-group">
+                    <div class="form-group">
+                      <input formControlName="name" />
+                      <label for="name">Hozzávaló:</label>
+                    </div>
+                    <div class="form-group">
+                      <input formControlName="amount" type="number" />
+                      <label for="amount">Mennyiség:</label>
+                    </div>
+
+                    <div class="form-group">
+                      <select formControlName="unit">
+                        @for (unit of unitEnum; track unit) {
+                          <option [value]="unit">{{ unit }}</option>
+                        }
+                      </select>
+                    </div>
+                    <i
+                      class="fa-solid fa-trash"
+                      (click)="removeIngredient(i, j)"
+                      tabindex="0"
+                      (keyup)="removeIngredient(i, j)"
+                    ></i>
+                  </div>
+                </div>
+              }
+
+              <button type="button" (click)="addIngredient(i)">+ Hozzávaló hozzáadása</button>
+            </div>
+          </div>
+        }
+      </div>
+      <div>
+        @if (showNewSectionInput) {
+          <div class="form-group col-4">
+            <input formControlName="sectionName" />
+            <label for="sectionName">Új szekció neve:</label>
+            <i
+              class="fa-solid fa-circle-check ms-4"
+              (click)="addSection()"
+              (keyup)="addSection()"
+              tabindex="0"
+            ></i>
+          </div>
+        }
+
+        @if (!showNewSectionInput) {
+          <button type="button" (click)="showNewSectionInput = true">
+            + Új szekció hozzáadása
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="steps-container">
+      <h3>Elkészítési lépések</h3>
+      <div formArrayName="steps" class="steps">
+        <div
+          *ngFor="let step of steps.controls; let i = index"
+          [formGroupName]="i"
+          class="step-row"
+        >
+          <div class="step-index">{{ i + 1 }}.</div>
+          <div class="form-group">
+            <textarea formControlName="stepDescription" type="text" placeholder=" "></textarea>
+            <label for="stepDescription">Elkészítési lépés</label>
+          </div>
+          <i
+            class="fa-solid fa-trash"
+            (click)="removeStep(i)"
+            tabindex="0"
+            (keyup)="removeStep(i)"
+          ></i>
+        </div>
+      </div>
+      <button type="button" class="base-button" (click)="onAddStepClick()">
+        + Lépés hozzáadása
+      </button>
+    </div>
+
+    <div class="form-group">
+      <input id="prepTime" formControlName="prepTime" type="number" placeholder=" " />
+      <label for="prepTime">Előkészítési idő (perc):</label>
+    </div>
+
+    <div class="form-group">
+      <input id="servings" formControlName="servings" type="number" placeholder=" " />
+      <label for="servings">Adagok száma:</label>
+    </div>
+
+    <div class="custom-select-group">
+      <div class="custom-select ps-3">
+        <div
+          class="custom-select-input dif"
+          [ngClass]="{ active: isDifficultyDropdownOpen }"
+          (click)="isDifficultyDropdownOpen = !isDifficultyDropdownOpen"
+          (keyup)="isDifficultyDropdownOpen = !isDifficultyDropdownOpen"
+          tabindex="0"
+        >
+          <div class="text-container">
+            {{ selectedDifficulty ? selectedDifficulty : "Nehézség" }}
+          </div>
+          <div class="icon-container">
+            <i
+              class="fa-solid"
+              [ngClass]="{
+                'fa-sort-up': isDifficultyDropdownOpen,
+                'fa-sort-down': !isDifficultyDropdownOpen,
+              }"
+            ></i>
+          </div>
+        </div>
+        @if (isDifficultyDropdownOpen) {
+          <div class="custom-dropdown-menu">
+            <ul>
+              @for (difficulty of difficultyEnum; track difficulty) {
+                <li
+                  [ngClass]="{ 'active-item': selectedDifficulty === difficulty }"
+                  (click)="selectDifficulty(difficulty)"
+                  (keyup)="selectDifficulty(difficulty)"
+                  tabindex="0"
+                >
+                  {{ difficulty }}
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+      <div class="custom-select ps-3">
+        <div
+          class="custom-select-input cat"
+          [ngClass]="{ active: isCategoryDropdownOpen }"
+          (click)="isCategoryDropdownOpen = !isCategoryDropdownOpen"
+          (keyup)="isCategoryDropdownOpen = !isCategoryDropdownOpen"
+          tabindex="0"
+        >
+          <div class="text-container">
+            {{ selectedCategory ? selectedCategory : "Kategória" }}
+          </div>
+          <div class="icon-container">
+            <i
+              class="fa-solid"
+              [ngClass]="{
+                'fa-sort-up': isCategoryDropdownOpen,
+                'fa-sort-down': !isCategoryDropdownOpen,
+              }"
+            ></i>
+          </div>
+        </div>
+
+        @if (isCategoryDropdownOpen) {
+          <div class="custom-dropdown-menu">
+            <ul>
+              @for (category of categoryEnum; track category) {
+                <li
+                  *ngFor="let category of categoryEnum"
+                  [ngClass]="{ 'active-item': selectedCategory === category }"
+                  (click)="selectCategory(category)"
+                  (keyup)="selectCategory(category)"
+                  tabindex="0"
+                >
+                  {{ category }}
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="tags-container">
+      <div class="container">
+        <div class="form-group">
+          <input
+            id="tagsInput"
+            type="text"
+            formControlName="newTag"
+            placeholder=" "
+            (keyup.enter)="onAddTagClick()"
+          />
+          <label for="tagsInput">Címkék:</label>
+        </div>
+        <div>
+          <button type="button" class="base-button" (click)="onAddTagClick()">+</button>
+        </div>
+      </div>
+      <div class="tags-list">
+        @for (t of tagsList(); track t) {
+          <div class="tag">
+            <span>{{ t }}</span>
+            <i
+              class="fa-solid fa-circle-xmark"
+              (click)="onRemoveTagClick(t)"
+              (keyup)="onRemoveTagClick(t)"
+              tabindex="0"
+            ></i>
+          </div>
+        }
+      </div>
+    </div>
+    <div class="fileUpload">
+      <div class="form-group">
+        <input
+          id="imageUrl"
+          formControlName="imageUrl"
+          type="file"
+          (change)="onFileSelected($event)"
+        /><label for="imageUrl">Kép:</label>
+      </div>
+    </div>
+    <div class="submitButton">
+      <div class="footer w-100">
+        <button class="base-button submit" type="submit" [disabled]="receipeForm.invalid">
+          {{ existingReceipt() ? "Recept módosítása" : "Recept létrehozása" }}
+        </button>
+      </div>
+    </div>
+  </form>
+</ng-template>

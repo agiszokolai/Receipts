@@ -1,0 +1,33 @@
+<app-modal
+  [isModalVisible]="warningModalOpen"
+  [header]="'Bejelentkezés szükséges'"
+  [formTemplate]="authenticationWarning"
+  [size]="'small'"
+  (closeEvent)="close()"
+></app-modal>
+
+<ng-template #authenticationWarning>
+  <div class="authentication-warning">
+    <p>
+      A recept mentéséhez, kedveléséhez és értékeléséhez előbb
+      <strong>be kell jelentkezned</strong> vagy <strong>létre kell hoznod egy fiókot</strong>.
+    </p>
+    <div class="buttons d-flex flex-column">
+      <button class="base-button" (click)="openLoginModal()">Bejelentkezés</button>
+      <button class="base-button secondary" (click)="openRegistrationModal()">Regisztráció</button>
+    </div>
+  </div>
+</ng-template>
+
+@if (isLoginModalOpen) {
+  <app-login
+    [isLoginModalOpen]="isLoginModalOpen"
+    (closeEvent)="isLoginModalOpen = false"
+  ></app-login>
+}
+@if (isRegistrationModalOpen) {
+  <app-registration
+    [isRegistrationModalOpen]="isRegistrationModalOpen"
+    (closeEvent)="isRegistrationModalOpen = false"
+  ></app-registration>
+}

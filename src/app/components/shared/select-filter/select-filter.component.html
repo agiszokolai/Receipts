@@ -1,0 +1,39 @@
+<div class="custom-select ps-3">
+  <div
+    class="categories-container"
+    [ngClass]="{ open: isVisible }"
+    (click)="this.isVisible = !this.isVisible"
+    tabindex="0"
+    (keyup)="this.isVisible = !this.isVisible"
+  >
+    <span>{{ title() }}:</span>
+    <i class="fa-solid fa-sort-down ps-1 pe-2"></i>
+  </div>
+
+  @if (isVisible) {
+    <div class="categories">
+      @for (option of visibleValues; track $index) {
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            (change)="onOptionChange(option, $event)"
+            tabindex="0"
+            [checked]="selectedValues().includes(option)"
+          />
+          <div class="label-text">
+            <span>{{ option }} </span>
+            @if (title() === "Értékelés") {
+              <i class="fa-solid fa-star ps-1"></i>
+            }
+          </div>
+        </label>
+      }
+    </div>
+    @if (options().length > 3) {
+      <p (click)="this.showAll = !this.showAll" (keyup)="this.showAll = !this.showAll" tabindex="0">
+        {{ showAll ? "Kevesebb" : "Több" }}
+      </p>
+    }
+  }
+</div>
+<hr />

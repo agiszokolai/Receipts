@@ -1,0 +1,178 @@
+<div class="receipt-container">
+  <div class="receipt-header">
+    <div class="header-left col-lg-6 col-md-12 col-sm-12">
+      <button (click)="navigateBack()" (keyup)="navigateBack()" tabindex="0">
+        <i class="fa-solid fa-angle-left me-2"></i>Vissza
+      </button>
+      <img [src]="receipt.imageUrl" [alt]="receipt.name" />
+      <div class="category-difficulty-container">
+        <span class="category">{{ receipt.category }}</span>
+        <span
+          class="difficulty"
+          [ngClass]="{
+            easy: receipt.difficulty === 'Könnyű',
+            medium: receipt.difficulty === 'Közepes',
+            hard: receipt.difficulty === 'Nehéz',
+          }"
+          >{{ receipt.difficulty }}</span
+        >
+      </div>
+
+      <div class="rating mb-3">
+        <div class="star">
+          <span> {{ receipt.averageRating }}</span>
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <div class="likes">
+          <span>{{ receipt.likes }}</span>
+          <i class="fa-solid fa-heart"></i>
+        </div>
+      </div>
+      <div class="receipt-tags">
+        <div class="tags">
+          @for (t of receipt.tags; track t) {
+            <span class="tag">{{ t }}</span>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="header-right col-lg-6 col-md-12 col-sm-12">
+      <div class="name">{{ receipt.name }}</div>
+      <div class="creator-rating">
+        <div class="creator">
+          <div
+            class="creator-img"
+            (click)="navigateToCreator()"
+            (keyup)="navigateToCreator()"
+            tabindex="0"
+          >
+            <img [src]="creator!.profilePictureUrl" alt="" />
+            <span>{{ creator.name }}</span>
+          </div>
+
+          <p class="date pt-3">{{ receipt.createdAt }}</p>
+        </div>
+      </div>
+      <div>
+        <div class="receipt-save">
+          <button
+            class="btn"
+            [ngClass]="{ saved: isSaved() }"
+            (click)="updateUserReceipt('save', !isSaved())"
+          >
+            <i
+              class="fa-bookmark me-2"
+              [ngClass]="{
+                'fa-solid': isSaved() || isBookMarkHovered,
+                'fa-regular': !(isSaved() || isBookMarkHovered),
+              }"
+              (mouseenter)="isBookMarkHovered = true"
+              (mouseleave)="isBookMarkHovered = false"
+            ></i
+            >{{ isSaved() ? "Recept mentve" : "Recept mentése" }}
+          </button>
+          <div class="icon">
+            <i
+              tabindex="0"
+              class="fa-heart"
+              [ngClass]="{
+                'fa-solid': isLiked() || isHeartHovered,
+                'fa-regular': !(isLiked() || isHeartHovered),
+              }"
+              (click)="updateUserReceipt('like', !isLiked())"
+              (keyup)="updateUserReceipt('like', !isLiked())"
+              (mouseenter)="isHeartHovered = true"
+              (mouseleave)="isHeartHovered = false"
+            ></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="receipt-body">
+    <div class="d-flex align-items-center flex-column w-100">
+      <h4 class="text-center">Leírás</h4>
+      <div class="w-85">
+        <p class="justify-text">{{ receipt.description }}</p>
+      </div>
+    </div>
+
+    <div class="body-steps-ingredients mt-3">
+      <div class="steps-ingredients-container">
+        <div class="steps col-lg-8 col-md-6 col-sm-12">
+          <span class="text-left mt-4 mb-3">Elkészítés</span>
+
+          <ol>
+            @for (s of receipt.steps!; track s) {
+              <li class="my-2">
+                {{ s }}
+              </li>
+            }
+          </ol>
+        </div>
+
+        <div class="ingredients col-lg-4 col-md-6 col-sm-12">
+          <div class="ingredientHeader">
+            <span>Hozzávalók</span>
+          </div>
+          @for (s of receipt.ingredients; track s.sectionName) {
+            <div class="ingredient-section">
+              <strong>{{ s.sectionName }}</strong>
+
+              <ul>
+                @for (i of s.ingredients; track i) {
+                  <li class="my-2 ingredient">{{ i.amount }} {{ i.unit }} {{ i.name }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="receipt-footer">
+    <!--  <div class="receipt-tags">
+      @for (t of receipt.tags!; track t) {
+        <span class="tag">{{ t }}</span>
+      }
+    </div> -->
+    <div class="rating">
+      <div>Értékeld a receptet</div>
+      <div class="stars">
+        @for (star of stars; track star) {
+          <i
+            class="fa-solid fa-star"
+            [ngClass]="{ filled: star <= rating, hovered: star <= hoverIndex }"
+            (click)="setRating(star)"
+            (keyup)="setRating(star)"
+            (mouseenter)="hoverIndex = star"
+            (mouseleave)="hoverIndex = 0"
+            tabindex="0"
+          >
+          </i>
+        }
+      </div>
+      @if (isRatingChanged) {
+        <div appFade>
+          <button class="save-btn" (click)="saveRating()">Értékelés mentése</button>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+@if (isModalOpen()) {
+  <app-authentication-warning-modal
+    [isModalOpen]="isModalOpen()"
+    (closeModal)="isModalOpen.set(false)"
+  ></app-authentication-warning-modal>
+}
+@if (isSaveModalOpen()) {
+  <app-save-recipe
+    [isModalOpen]="isSaveModalOpen()"
+    [user]="user()!"
+    [recipe]="receipt"
+    (closeEvent)="this.isSaveModalOpen.set(false)"
+    (saveEvent)="handleSaveEvent($event)"
+  ></app-save-recipe>
+}

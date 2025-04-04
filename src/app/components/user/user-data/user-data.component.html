@@ -1,0 +1,100 @@
+<div class="photo">
+  <img [src]="user().profilePictureUrl ?? blankUser" [alt]="user().name" />
+</div>
+<div class="description">
+  <div class="name">{{ user().name }}</div>
+  <p>&#64;{{ user().username }}</p>
+  <div>{{ user().description }}</div>
+  <div class="numbers">
+    <span>
+      <i class="fa-solid fa-receipt"></i>
+      {{ user().receipts.created.length }}</span
+    >
+    <span><i class="fa-solid fa-heart pe-2"></i> {{ userReceiptsLikes() }}</span>
+  </div>
+</div>
+<hr />
+
+@if (customerOwnProfile()) {
+  <div class="button-div">
+    <button type="button" (click)="isCreateReceipt.set(true)">Recept írása</button>
+  </div>
+  <div class="button-div">
+    @if (!isChangeData()) {
+      <button type="button" (click)="isChangeData.set(true)" *ngIf="!isChangeData()">
+        Adatok módosítása
+      </button>
+    }
+
+    @if (isChangeData()) {
+      <button type="button" (click)="isChangeData.set(false)" *ngIf="isChangeData()">Mégse</button>
+    }
+  </div>
+
+  @if (isChangeData()) {
+    <ng-container>
+      <form [formGroup]="userForm">
+        <div class="form">
+          <div class="form-group profile">
+            <input type="text" id="name" formControlName="name" placeholder=" " />
+            <label for="name">Név:</label>
+          </div>
+          <div class="form-group profile">
+            <input type="text" id="username" formControlName="username" placeholder=" " />
+            <label for="username">Felhasználónév:</label>
+          </div>
+          <div class="form-group profile">
+            <input type="email" id="email" formControlName="email" placeholder=" " />
+            <label for="email">E-mail cím:</label>
+          </div>
+
+          <div class="form-group profile mt-3">
+            <textarea
+              id="description"
+              formControlName="description"
+              placeholder=" "
+              [cols]="50"
+              [rows]="4"
+            ></textarea>
+            <label for="description">Magamról:</label>
+          </div>
+
+          <div class="button-div">
+            <button type="submit">Mentés</button>
+          </div>
+        </div>
+      </form>
+
+      <hr />
+
+      <form [formGroup]="passwordForm">
+        <div class="form">
+          <div class="form-group profile">
+            <input type="password" id="password" formControlName="password" placeholder=" " />
+            <label for="password">Jelszó:</label>
+          </div>
+          <div class="form-group profile">
+            <input
+              type="password"
+              id="passwordConfirm"
+              formControlName="passwordConfirm"
+              placeholder=" "
+            />
+            <label for="passwordConfirm">Jelszó megerősítése:</label>
+          </div>
+        </div>
+        <div class="button-div">
+          <button type="submit">Mentés</button>
+        </div>
+      </form>
+    </ng-container>
+  }
+}
+@if (isCreateReceipt()) {
+  <app-recipe-create
+    [user]="user()"
+    [isCreateReceipt]="isCreateReceipt()"
+    (createEvent)="createEvent.emit($event); isCreateReceipt.set(false)"
+    (closeEvent)="isCreateReceipt.set(false)"
+  ></app-recipe-create>
+}

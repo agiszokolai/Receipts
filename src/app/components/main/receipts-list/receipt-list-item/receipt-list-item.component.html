@@ -1,0 +1,53 @@
+<div class="list-item-content me-2">
+  <div>
+    <img [src]="receipt().imageUrl" [alt]="receipt().name" class="list-item-img" />
+  </div>
+  <div>
+    <span
+      class="list-item-name"
+      (click)="navigateToReceipt()"
+      (keyup)="navigateToReceipt()"
+      tabindex="0"
+      >{{ receipt().name }}</span
+    >
+  </div>
+</div>
+<div class="list-item-footer">
+  <div class="recipe-button">
+    <button class="btn receipt-button" (click)="navigateToReceipt()">Recept</button>
+  </div>
+  <div class="icons">
+    <i
+      tabindex="0"
+      class="fa-heart"
+      [ngClass]="{
+        'fa-solid': isLiked || isHeartHovered,
+        'fa-regular': !(isLiked || isHeartHovered),
+      }"
+      (keyup)="onLikedClick(receipt(), !isLiked)"
+      (click)="onLikedClick(receipt(), !isLiked)"
+      (mouseenter)="isHeartHovered = true"
+      (mouseleave)="isHeartHovered = false"
+    ></i>
+  </div>
+  <div class="icons">
+    <i
+      class="fa-bookmark"
+      [ngClass]="{
+        'fa-solid': isSaved || isBookMarkHovered,
+        'fa-regular': !isSaved || !isBookMarkHovered,
+      }"
+      (click)="onSavedClick(receipt(), !isSaved)"
+      (keyup)="onSavedClick(receipt(), !isSaved)"
+      (mouseenter)="isBookMarkHovered = true"
+      (mouseleave)="isBookMarkHovered = false"
+      tabindex="0"
+    ></i>
+  </div>
+</div>
+@if (isModalOpen) {
+  <app-authentication-warning-modal
+    [isModalOpen]="isModalOpen"
+    (closeModal)="isModalOpen = false"
+  ></app-authentication-warning-modal>
+}

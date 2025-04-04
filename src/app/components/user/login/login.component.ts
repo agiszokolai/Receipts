@@ -2,10 +2,10 @@ import { Component, EventEmitter, inject, input, Output } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { take } from 'rxjs';
 import { emailValidator } from '../../../helpers/validators';
-import { UserService } from '../../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -25,7 +25,7 @@ export class LoginComponent {
     password: new FormControl('', Validators.required),
   });
 
-  private userService = inject(UserService);
+  private authService = inject(AuthService);
   private toastr = inject(ToastrService);
 
   //TODO: elfelejtett jelszót csinálni
@@ -36,7 +36,7 @@ export class LoginComponent {
   onSubmit() {
     const formData = this.logInForm.getRawValue();
     if (formData) {
-      this.userService
+      this.authService
         .logIn(formData.email!, formData.password!)
         .pipe(take(1))
         .subscribe({

@@ -13,6 +13,8 @@ import { AuthenticationWarningModalComponent } from '../../../shared/modal/authe
 import { blankFood } from '../../../../helpers/constants';
 import { SearchService } from '../../../../services/search.service';
 import { SaveRecipeComponent } from '../save-recipe/save-recipe.component';
+import { UserReceiptsService } from '../../../../services/user-receipts.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-receipt',
@@ -71,7 +73,9 @@ export class ReceiptComponent implements OnInit, OnDestroy {
 
   private readonly destroyed$ = new ReplaySubject<void>(1);
 
+  private userReceiptService = inject(UserReceiptsService);
   private receiptService = inject(ReceiptsService);
+  private authService = inject(AuthService);
   private userService = inject(UserService);
   private searchService = inject(SearchService);
   private router = inject(Router);
@@ -81,7 +85,7 @@ export class ReceiptComponent implements OnInit, OnDestroy {
     this.receiptId = history.state.id;
     this.filterdReceipts$ = this.searchService.filteredList$;
 
-    this.userService.user$.pipe(takeUntil(this.destroyed$)).subscribe({
+    this.authService.user$.pipe(takeUntil(this.destroyed$)).subscribe({
       next: (u) => {
         this.user.set(u);
 
@@ -206,14 +210,14 @@ export class ReceiptComponent implements OnInit, OnDestroy {
       if (add) {
         this.isSaveModalOpen.set(true);
       } else {
-        this.userService
+        this.userReceiptService
           .removeSavedReceipt(userId, receiptId)
           .pipe(take(1))
           .subscribe({
             next: (updatedUser) => {
               if (updatedUser) {
                 this.isSaved.set(false);
-                this.userService.updateUser(updatedUser);
+                this.authService.updateUser(updatedUser);
                 this.toastr.success('Sikeresen kikerült a recept a mentettek közül');
               }
             },
@@ -226,14 +230,14 @@ export class ReceiptComponent implements OnInit, OnDestroy {
       // Ha kedvelés történik, akkor a service hívás folytatódik
 
       const serviceCall = add
-        ? this.userService.addLikedReceipt(userId, receiptId)
-        : this.userService.removeLikedReceipt(userId, receiptId);
+        ? this.userReceiptService.addLikedReceipt(userId, receiptId)
+        : this.userReceiptService.removeLikedReceipt(userId, receiptId);
 
       serviceCall.pipe(take(1)).subscribe({
         next: (updatedUser) => {
           if (updatedUser) {
             this.isLiked.set(add);
-            this.userService.updateUser(updatedUser);
+            this.authService.updateUser(updatedUser);
           }
         },
         error: (err) => {

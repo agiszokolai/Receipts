@@ -15,6 +15,8 @@ import { SelectFilterComponent } from '../../shared/select-filter/select-filter.
 import { FormsModule } from '@angular/forms';
 import { SaveRecipeComponent } from './save-recipe/save-recipe.component';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../../services/auth.service';
+import { UserReceiptsService } from '../../../services/user-receipts.service';
 
 @Component({
   selector: 'app-receipts-list',
@@ -77,7 +79,9 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
 
   private readonly receiptsService = inject(ReceiptsService);
   public readonly searchService = inject(SearchService);
+  public readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
+  private readonly userReceiptsService = inject(UserReceiptsService);
   private readonly toastr = inject(ToastrService);
 
   get searchData() {
@@ -97,7 +101,7 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
   }
 
   getActiveUser(): void {
-    this.userService.user$
+    this.authService.user$
       .pipe(
         switchMap((u) => {
           this.user = u;
@@ -155,15 +159,17 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
               this.isSaveModalOpen.set(true);
             } else {
               this.isSaveModalOpen.set(false);
-              this.userService.removeSavedReceipt(currentUser.userId, event.receiptId).subscribe({
-                next: (user) => {
-                  if (user) {
-                    this.userService.updateUser(user);
-                    this.getActiveUser();
-                    this.toastr.success('Sikeresen kikerült a recept a mentettek közül');
-                  }
-                },
-              });
+              this.userReceiptsService
+                .removeSavedReceipt(currentUser.userId, event.receiptId)
+                .subscribe({
+                  next: (user) => {
+                    if (user) {
+                      this.authService.updateUser(user);
+                      this.getActiveUser();
+                      this.toastr.success('Sikeresen kikerült a recept a mentettek közül');
+                    }
+                  },
+                });
             }
           },
           error: () => {
@@ -174,19 +180,19 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
 
     if (event.action === 'like') {
       if (event.state) {
-        this.userService.addLikedReceipt(currentUser.userId, event.receiptId).subscribe({
+        this.userReceiptsService.addLikedReceipt(currentUser.userId, event.receiptId).subscribe({
           next: (user) => {
             if (user) {
-              this.userService.updateUser(user);
+              this.authService.updateUser(user);
               this.toastr.success('Sikeresen kedvencnek jelölve!');
             }
           },
         });
       } else {
-        this.userService.removeLikedReceipt(currentUser.userId, event.receiptId).subscribe({
+        this.userReceiptsService.removeLikedReceipt(currentUser.userId, event.receiptId).subscribe({
           next: (user) => {
             if (user) {
-              this.userService.updateUser(user);
+              this.authService.updateUser(user);
               this.toastr.success('Sikeresen eltávolítva a kedvencek közül!');
             }
           },

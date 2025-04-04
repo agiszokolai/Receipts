@@ -10,6 +10,7 @@ import { UserReceiptsComponent } from '../user-receipts/user-receipts.component'
 import { UserDataComponent } from '../user-data/user-data.component';
 import { SearchService } from '../../../services/search.service';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -39,6 +40,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private readonly destroyed$ = new ReplaySubject<void>(1);
 
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private receiptService = inject(ReceiptsService);
   private searchService = inject(SearchService);
   private route = inject(ActivatedRoute);
@@ -46,7 +48,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private toastr = inject(ToastrService);
 
   ngOnInit(): void {
-    this.userService.user$.pipe(takeUntil(this.destroyed$)).subscribe((u) => {
+    this.authService.user$.pipe(takeUntil(this.destroyed$)).subscribe((u) => {
       this.activeUser.set(u);
       this.getUserData();
     });

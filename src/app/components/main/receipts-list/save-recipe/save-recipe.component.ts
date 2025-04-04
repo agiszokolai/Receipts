@@ -7,6 +7,7 @@ import { IReceipt } from '../../../../model/receipt';
 import { UserService } from '../../../../services/user.service';
 import { ReplaySubject, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import { UserReceiptsService } from '../../../../services/user-receipts.service';
 
 @Component({
   selector: 'app-save-recipe',
@@ -33,6 +34,7 @@ export class SaveRecipeComponent implements OnDestroy {
 
   private readonly destroyed$ = new ReplaySubject<void>(1);
   private userService = inject(UserService);
+  private userReceiptsService = inject(UserReceiptsService);
   private toastr = inject(ToastrService);
 
   ngOnDestroy(): void {
@@ -45,7 +47,7 @@ export class SaveRecipeComponent implements OnDestroy {
 
     if (this.saveOption === 'simple') {
       this.user()?.receipts.saved.push(this.recipe().id);
-      this.userService
+      this.userReceiptsService
         .addSavedReceipt(this.user().userId, this.recipe().id)
         .pipe(takeUntil(this.destroyed$))
         .subscribe({
@@ -65,7 +67,7 @@ export class SaveRecipeComponent implements OnDestroy {
           },
         });
     } else if (this.saveOption === 'collection' && this.selectedCollection) {
-      this.userService
+      this.userReceiptsService
         .addSavedReceipt(this.user().userId, this.recipe().id, this.selectedCollection.id)
         .pipe(takeUntil(this.destroyed$))
         .subscribe({

@@ -1,12 +1,12 @@
 import { Component, EventEmitter, inject, input, Output } from '@angular/core';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { take } from 'rxjs';
-import { UserService } from '../../../services/user.service';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { emailValidator, passwordConfirmValidator } from '../../../helpers/validators';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-registration',
@@ -27,7 +27,7 @@ export class RegistrationComponent {
     passwordConfirm: new FormControl('', [Validators.required, passwordConfirmValidator()]),
   });
 
-  private userService = inject(UserService);
+  private authService = inject(AuthService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
 
@@ -38,7 +38,7 @@ export class RegistrationComponent {
   onSubmit() {
     const formData = this.registrationForm.getRawValue();
 
-    this.userService
+    this.authService
       .registration(formData.email!, formData.name!, formData.username!, formData.password!)
       .pipe(take(1))
       .subscribe({

@@ -4,7 +4,6 @@ import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
-import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ReceiptsMockService } from './services/receipts-mock.service';
 import { ReceiptsService } from './services/receipts.service';
 import { UserMockService } from './services/user-mock.service';
@@ -27,7 +26,6 @@ export const appConfig: ApplicationConfig = {
           },
         ]
       : []),
-    { provide: LocationStrategy, useClass: PathLocationStrategy },
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })),
     provideAnimations(),
     provideToastr({
@@ -35,6 +33,7 @@ export const appConfig: ApplicationConfig = {
       progressBar: true,
       progressAnimation: 'increasing',
       preventDuplicates: true,
+      timeOut: 2000,
     }),
   ],
 };

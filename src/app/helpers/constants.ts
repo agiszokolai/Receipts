@@ -1,5 +1,6 @@
 export const blankUser = '../assets/images/users/blank-profile-picture.png';
 export const blankFood = '../assets/images/blank-food.png';
+export const foodLanding = '../assets/images/food-stock3.png';
 
 export enum DifficultyEnum {
   Easy = 'Könnyű',

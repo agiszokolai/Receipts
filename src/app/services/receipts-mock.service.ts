@@ -3,12 +3,15 @@ import { Observable, of } from 'rxjs';
 import { IReceipt, IReview } from '../model/receipt';
 import { MOCK_RECEIPTS } from '../mocks/mock-recipe-data';
 import { generateSlug } from '../helpers/validators';
+import { IUser } from '../model/user';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReceiptsMockService {
   getReceipts(): Observable<IReceipt[]> {
+    /*  const list = MOCK_RECEIPTS.concat(MOCK_RECEIPTS, MOCK_RECEIPTS);
+    return of(list); */
     return of(MOCK_RECEIPTS);
   }
 
@@ -29,14 +32,12 @@ export class ReceiptsMockService {
     return of(receipts);
   }
 
-  createReceipt(newReceipt: IReceipt): Observable<IReceipt | null> {
-    const createdReceipt: IReceipt = { ...newReceipt };
-
+  createReceipt(newReceipt: IReceipt, user: IUser): Observable<IUser | null> {
     // Hozzáadjuk az új receptet a MOCK_RECEIPTS tömbhöz
-    MOCK_RECEIPTS.push(createdReceipt);
-
+    MOCK_RECEIPTS.push(newReceipt);
+    user.receipts.created.push(newReceipt.id);
     // Visszaadjuk az új receptet
-    return of(createdReceipt);
+    return of(user);
   }
 
   updateReceipt(receipt: IReceipt): Observable<IReceipt | null> {

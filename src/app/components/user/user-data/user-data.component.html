@@ -93,8 +93,8 @@
 @if (isCreateReceipt()) {
   <app-recipe-create
     [user]="user()"
-    (createEvent)="createEvent.emit($event); isCreateReceipt.set(false)"
     [isCreateReceipt]="isCreateReceipt()"
+    (createEvent)="createEvent.emit($event); isCreateReceipt.set(false)"
     (closeEvent)="isCreateReceipt.set(false)"
   ></app-recipe-create>
 }

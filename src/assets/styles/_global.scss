@@ -18,12 +18,13 @@
 }
 
 .w-85 {
-  width: 85%;
+  /* width: 85%; */
+  margin-inline: 10%;
 }
 
 .fa-trash,
 .fa-circle-check {
-  color: c.$yellow;
+  color: c.$blue;
   transition: color 0.3s ease-in-out;
   &:hover {
     color: c.$hover-color;

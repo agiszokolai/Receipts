@@ -27,6 +27,7 @@ export class LoginComponent {
 
   private userService = inject(UserService);
   private toastr = inject(ToastrService);
+
   //TODO: elfelejtett jelszót csinálni
   /**
    * Bejelentkezés
@@ -41,14 +42,13 @@ export class LoginComponent {
         .subscribe({
           next: (u) => {
             if (u) {
-              console.log('Sikeres bejelentkezés:', u);
+              this.toastr.success('Sikeres bejelentkezés!');
               this.logInForm.reset();
               this.closeEvent.emit();
             }
           },
-          error: (error) => {
+          error: () => {
             this.toastr.error('Hiba történt a bejelentkezés során!');
-            console.error('Hiba történt:', error.message);
           },
         });
     }

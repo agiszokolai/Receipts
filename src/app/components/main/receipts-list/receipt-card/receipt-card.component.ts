@@ -12,7 +12,6 @@ import { blankFood } from '../../../../helpers/constants';
   standalone: true,
   imports: [CommonModule, AuthenticationWarningModalComponent],
   templateUrl: './receipt-card.component.html',
-  styleUrl: './receipt-card.component.scss',
 })
 export class ReceiptCardComponent implements OnInit {
   /* Aktuális recept */
@@ -86,6 +85,8 @@ export class ReceiptCardComponent implements OnInit {
    * Átnavigál a recept oldalára
    */
   navigateToReceipt(): void {
-    this.router.navigate(['/recept', generateSlug(this.receipt().name)]);
+    this.router.navigate(['/recept', generateSlug(this.receipt().name)], {
+      state: { id: this.receipt().id, direction: `/receptek` },
+    });
   }
 }

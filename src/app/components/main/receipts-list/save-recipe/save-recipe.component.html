@@ -1,0 +1,60 @@
+<app-modal
+  [isModalVisible]="isModalOpen()"
+  [header]="'Recept mentése'"
+  [size]="'medium'"
+  [footerButtonLabel]="'Recept mentése'"
+  [isFooterCancelVisible]="true"
+  [formTemplate]="saveReceiptTemplate"
+  (submitEvent)="saveReceipt()"
+  (closeEvent)="closeModal()"
+></app-modal>
+
+<ng-template #saveReceiptTemplate>
+  <div class="saveRecipe">
+    <div class="radio-options">
+      <label>
+        <input type="radio" name="saveOption" [(ngModel)]="saveOption" value="simple" />
+        Csak mentés
+      </label>
+
+      <label>
+        <input type="radio" name="saveOption" [(ngModel)]="saveOption" value="collection" />
+        Mentés gyűjteménybe
+      </label>
+    </div>
+    <div *ngIf="saveOption === 'collection'" class="collections">
+      <span class="span-header">Gyűjtemény:</span>
+      <div
+        class="select-box"
+        [ngClass]="{ open: isDropdownOpen }"
+        (click)="isDropdownOpen = !isDropdownOpen"
+        (keyup)="isDropdownOpen = !isDropdownOpen"
+        tabindex="0"
+      >
+        <span>
+          {{ selectedCollection?.name || "Válassz gyűjteményt" }}
+        </span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+
+      @if (isDropdownOpen) {
+        <ul class="options">
+          @for (collection of user().receipts.collections; track collection) {
+            <li
+              [class.selected]="collection.id === selectedCollection?.id"
+              (click)="selectedCollection = collection; isDropdownOpen = false"
+              (keyup)="selectedCollection = collection; isDropdownOpen = false"
+              tabindex="0"
+            >
+              {{ collection.name }}
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+
+  <div class="footer w-100">
+    <button (click)="saveReceipt()" class="footer w-100">Mentés</button>
+  </div>
+</ng-template>

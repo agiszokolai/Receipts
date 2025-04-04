@@ -11,9 +11,10 @@
       ></i>
     </div>
     <div class="content h-100">
-      @if (formTemplate) {
-        <ng-container *ngTemplateOutlet="formTemplate"></ng-container>
-      }
+      <ng-container *ngIf="formTemplate() as template">
+        <ng-container *ngTemplateOutlet="template"></ng-container>
+      </ng-container>
+
       <!-- @else if(content){
 
       } -->

@@ -4,13 +4,13 @@ button {
   border: 0px solid transparent !important;
   border-radius: 10px !important;
   font-weight: 500;
-  color: #000;
   box-shadow: 0 0 2px #000;
   text-transform: uppercase !important;
   letter-spacing: 2px;
   z-index: 1;
   position: relative;
   overflow: hidden;
+  color: #fff !important;
   transition: all 0.5s ease-in-out !important;
   padding: 5px 10px !important;
   text-wrap: wrap;
@@ -23,7 +23,8 @@ button {
     width: 100%;
     height: 100%;
     z-index: -2;
-    background-color: c.$yellow;
+
+    background-color: c.$blue;
   }
   &:before {
     content: "";
@@ -34,7 +35,8 @@ button {
     height: 100%;
     transition: all 0.5s ease-in-out !important;
     z-index: -1;
-    background-color: #faaf3e;
+
+    background-color: c.$hover-color;
   }
 
   &:disabled {
@@ -49,6 +51,7 @@ button {
   }
 
   &:hover {
+    color: #000 !important;
     &:before {
       width: 100%;
     }

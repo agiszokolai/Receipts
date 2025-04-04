@@ -1,9 +1,21 @@
-<div class="list-item-content">
-  <img [src]="receipt().imageUrl" [alt]="receipt().name" class="list-item-img" />
-  <span class="list-item-name ps-3">{{ receipt().name }}</span>
+<div class="list-item-content me-2">
+  <div>
+    <img [src]="receipt().imageUrl" [alt]="receipt().name" class="list-item-img" />
+  </div>
+  <div>
+    <span
+      class="list-item-name"
+      (click)="navigateToReceipt()"
+      (keyup)="navigateToReceipt()"
+      tabindex="0"
+      >{{ receipt().name }}</span
+    >
+  </div>
 </div>
 <div class="list-item-footer">
-  <button class="btn receipt-button" (click)="navigateToReceipt()">Recept</button>
+  <div class="recipe-button">
+    <button class="btn receipt-button" (click)="navigateToReceipt()">Recept</button>
+  </div>
   <div class="icons">
     <i
       tabindex="0"
@@ -17,6 +29,8 @@
       (mouseenter)="isHeartHovered = true"
       (mouseleave)="isHeartHovered = false"
     ></i>
+  </div>
+  <div class="icons">
     <i
       class="fa-bookmark"
       [ngClass]="{

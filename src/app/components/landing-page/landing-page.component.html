@@ -1,0 +1,141 @@
+<section id="header">
+  <div class="content">
+    <div class="title">
+      <h1>Fedezz fel új recepteket, oszd meg kedvenceidet, és készítsd el őket!</h1>
+      <p>Fedezz fel új és izgalmas recepteket, amelyeket könnyedén elkészíthetsz otthon is!</p>
+      <button (click)="navigateToReceipts()">Receptek</button>
+    </div>
+    <img [src]="foodImg" alt="" />
+  </div>
+</section>
+
+<section id="popular-content">
+  <div class="popular">
+    <div class="header">
+      <p>Népszerű receptek</p>
+      <p class="navigate">Megtekintés<i class="fa-solid fa-angle-right"></i></p>
+    </div>
+    <div class="landing-receipts">
+      <div class="receipt">
+        <div class="content">
+          <img [src]="foodImg" alt="" />
+          <span>Grillezett csirkemell</span>
+        </div>
+
+        <i class="fa-solid fa-up-right-from-square open-icon"></i>
+      </div>
+      <div class="receipt">
+        <div class="content">
+          <img [src]="foodImg" alt="" />
+          <span>Tyúkhúsleves</span>
+        </div>
+        <i class="fa-solid fa-up-right-from-square open-icon"></i>
+      </div>
+      <div class="receipt">
+        <div class="content">
+          <img [src]="foodImg" alt="" />
+          <span>Lazac párolt rizzsel</span>
+        </div>
+        <i class="fa-solid fa-up-right-from-square open-icon"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="new-content">
+  <div class="new">
+    <div class="header">
+      <p>Új receptek</p>
+      <p class="navigate">Megtekintés<i class="fa-solid fa-angle-right"></i></p>
+    </div>
+    <div class="landing-receipts">
+      <div class="receipt">
+        <div class="content">
+          <img [src]="foodImg" alt="" />
+          <span>Tyúkhúsleves</span>
+        </div>
+        <i class="fa-solid fa-up-right-from-square open-icon"></i>
+      </div>
+      <div class="receipt">
+        <div class="content">
+          <img [src]="foodImg" alt="" />
+          <span>Tyúkhúsleves</span>
+        </div>
+        <i class="fa-solid fa-up-right-from-square open-icon"></i>
+      </div>
+      <div class="receipt">
+        <div class="content">
+          <img [src]="foodImg" alt="" />
+          <span>Tyúkhúsleves</span>
+        </div>
+        <i class="fa-solid fa-up-right-from-square open-icon"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="creators">
+  <div class="new">
+    <div class="header">
+      <p>Népszerű receptkészítők</p>
+      <!--  <p class="navigate">Megtekintés<i class="fa-solid fa-angle-right"></i></p> -->
+    </div>
+    <div class="carousel slide" id="carousel" data-bs-wrap="true" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active" data-bs-interval="2000">
+          <img [src]="liaImg" alt="" />
+          <div class="caption">
+            <h5>Lia Doe</h5>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+          </div>
+        </div>
+        <div class="carousel-item" data-bs-interval="2000">
+          <img [src]="johnImg" alt="" />
+          <div class="caption">
+            <h5>John Smith</h5>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+          </div>
+        </div>
+        <div class="carousel-item" data-bs-interval="2000">
+          <img [src]="emmaImg" alt="Emma Brown" />
+          <div class="caption">
+            <h5>Emma Brown</h5>
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam doloremque, odit
+              sit unde aut veniam maxime
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#carousel"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#carousel"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon"></span>
+      </button>
+
+      <div class="carousel-indicators">
+        <button
+          type="button"
+          class="active"
+          data-bs-target="#carousel"
+          data-bs-slide-to="0"
+        ></button>
+        <button type="button" data-bs-target="#carousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#carousel" data-bs-slide-to="2"></button>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="footer"></section>

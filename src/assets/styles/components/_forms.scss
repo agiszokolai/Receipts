@@ -326,6 +326,31 @@ form {
   display: flex;
   flex-direction: column;
 }
+
+@media (max-width: 590px) {
+  .receipt-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+  }
+
+  .custom-select-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .tags-container {
+    display: flex;
+    flex-direction: column;
+    .container {
+      border-bottom: 1px solid rgb(163, 163, 163);
+    }
+    .tags-list {
+      min-height: 50px;
+    }
+  }
+}
 /* .form-group {
   position: relative;
   width: 100%;

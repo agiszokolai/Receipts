@@ -36,7 +36,6 @@ import { RecipeCreateComponent } from '../recipe-create/recipe-create.component'
     RecipeCreateComponent,
   ],
   templateUrl: './user-data.component.html',
-  styleUrl: './user-data.component.scss',
 })
 export class UserDataComponent implements OnInit, OnChanges {
   blankUser = blankUser;
@@ -49,7 +48,6 @@ export class UserDataComponent implements OnInit, OnChanges {
   /** A felhasználó saját profilja-e */
   customerOwnProfile = input<boolean>();
 
-  /** Esemény, amely értesíti a szülő komponenst a recept létrehozásáról*/
   @Output() createEvent = new EventEmitter<any>();
 
   isChangeData = signal<boolean>(false);

@@ -18,20 +18,19 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { UnitEnum, DifficultyEnum, CategoryEnum } from '../../../helpers/constants';
 import { IIngredientSection, IReceipt } from '../../../model/receipt';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { IUser } from '../../../model/user';
 import { MOCK_RECEIPTS } from '../../../mocks/mock-recipe-data';
 import { ModalComponent } from '../../shared/modal/modal.component';
+import { CategoryEnum, DifficultyEnum, UnitEnum } from '../../../helpers/constants';
 
 @Component({
   selector: 'app-recipe-create',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, ModalComponent],
   templateUrl: './recipe-create.component.html',
-  styleUrl: './recipe-create.component.scss',
 })
 export class RecipeCreateComponent implements OnInit {
   user = input.required<IUser>();
@@ -80,6 +79,10 @@ export class RecipeCreateComponent implements OnInit {
 
   /** címkék listája */
   tagsList = signal<string[]>([]);
+
+  private fb = inject(FormBuilder);
+  private toastr = inject(ToastrService);
+
   /**
    * Lépések FormArray getter
    */
@@ -96,8 +99,6 @@ export class RecipeCreateComponent implements OnInit {
   ingredients(index: number): FormArray {
     return (this.sections.at(index) as FormGroup).get('ingredients') as FormArray;
   }
-  private fb = inject(FormBuilder);
-  private toastr = inject(ToastrService);
 
   ngOnInit(): void {
     /*  this.receipeForm = new FormGroup({

@@ -12,7 +12,6 @@ import { blankFood } from '../../../../helpers/constants';
   standalone: true,
   imports: [CommonModule, AuthenticationWarningModalComponent],
   templateUrl: './receipt-list-item.component.html',
-  styleUrl: './receipt-list-item.component.scss',
 })
 export class ReceiptListItemComponent implements OnInit {
   /* Aktuális recept */
@@ -39,18 +38,6 @@ export class ReceiptListItemComponent implements OnInit {
     saved: boolean;
   }>();
 
-  /** A recept kedvelt állapota */
-  /* isLiked = signal(false); */
-
-  /** A recept mentett állapota */
-  /* isSaved = signal(false); */
-  get isLiked(): boolean {
-    return this.likedByUser();
-  }
-  get isSaved(): boolean {
-    return this.saveddByUser();
-  }
-
   isModalOpen = false;
   isLoginModalOpen = false;
   isRegistrationModalOpen = false;
@@ -62,6 +49,15 @@ export class ReceiptListItemComponent implements OnInit {
   isBookMarkHovered = false;
 
   blankFood = blankFood;
+
+  /** A recept kedvelt állapota */
+  get isLiked(): boolean {
+    return this.likedByUser();
+  }
+  /** A recept mentett állapota */
+  get isSaved(): boolean {
+    return this.saveddByUser();
+  }
 
   private router = inject(Router);
 
@@ -100,6 +96,8 @@ export class ReceiptListItemComponent implements OnInit {
    * Átnavigál a recept oldalára
    */
   navigateToReceipt(): void {
-    this.router.navigate(['/recept', generateSlug(this.receipt().name)]);
+    this.router.navigate(['/recept', generateSlug(this.receipt().name)], {
+      state: { id: this.receipt().id },
+    });
   }
 }

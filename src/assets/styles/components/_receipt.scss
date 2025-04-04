@@ -22,7 +22,7 @@
     padding-inline: 20px;
     background-color: white;
     border-radius: 15px;
-    /*     box-shadow: 2px 2px 10px c.$light_yellow;
+    /*     box-shadow: 2px 2px 10px c.$light_blue;
  */
 
     .header-left {
@@ -31,6 +31,10 @@
       height: 100%;
       position: relative;
       /*  margin-left: 15px; */
+
+      button {
+        margin-bottom: 10px;
+      }
 
       img {
         object-fit: cover;
@@ -58,7 +62,7 @@
         }
 
         i {
-          color: c.$yellow;
+          color: c.$blue;
           text-shadow: 0 0 1px #000;
         }
       }
@@ -75,8 +79,8 @@
           width: max-content;
           text-align: center;
           font-size: 0.9rem;
-          border: 2px solid c.$orange;
-          background-color: c.$light_yellow;
+          border: 2px solid c.$turquoise;
+          background-color: c.$light_blue;
           border-radius: 25px;
           padding: 5px 10px;
           margin: 5px;
@@ -86,8 +90,8 @@
           width: max-content;
           text-align: center;
           font-size: 0.9rem;
-          /* border: 2px solid c.$orange;
-    background-color: c.$light_yellow; */
+          /* border: 2px solid c.$turquoise;
+    background-color: c.$light_blue; */
           border-radius: 25px;
           padding: 5px 10px;
           margin: 5px;
@@ -98,8 +102,8 @@
             background-color: rgb(122, 226, 129);
           }
           &.medium {
-            border: 2px solid c.$orange;
-            background-color: c.$light_yellow;
+            border: 2px solid #e06a2b;
+            background-color: #f3d188;
           }
           &.hard {
             border: 2px solid rgb(172, 16, 16);
@@ -170,9 +174,11 @@
         button {
           font-size: 0.9rem;
           transition: all 0.5s ease-in-out;
-
+          font-weight: 500;
+          box-shadow: 0 0 2px #000;
           &.saved {
-            background-color: #f3d899;
+            /*  background-color: #f3d899; */
+            /*   color: #f0f0f0; */
           }
 
           .fa-bookmark {
@@ -181,7 +187,7 @@
             transition: all 0.5s ease-in-out;
 
             &.fa-solid {
-              color: c.$orange;
+              color: c.$turquoise;
             }
           }
 
@@ -189,11 +195,17 @@
             /*   transform: scale(1.02); */
             border: 1px solid black;
             border-radius: 10px;
+
+            .fa-bookmark {
+              &.fa-solid {
+                color: c.$blue;
+              }
+            }
           }
         }
 
         /*  .icon {
-          color: c.$yellow;
+          color: c.$blue;
           text-shadow: 0 0 1px #000;
           font-size: 1.6rem;
           cursor: pointer;
@@ -202,12 +214,12 @@
 
             &:hover {
               transform: scale(1.2);
-              color: c.$light_yellow;
+              color: c.$light_blue;
             }
           }
         } */
         .fa-heart {
-          color: c.$yellow;
+          color: c.$blue;
           cursor: pointer;
           padding-left: 20px;
           font-size: 1.7rem;
@@ -231,7 +243,7 @@
     padding: 20px;
     background-color: white;
     border-radius: 15px;
-    /*     box-shadow: 2px 2px 10px c.$light_yellow;
+    /*     box-shadow: 2px 2px 10px c.$light_blue;
  */
     .justify-text {
       text-align: justify;
@@ -250,7 +262,7 @@
         }
 
         .ingredients {
-          background-color: rgb(240, 223, 190);
+          background-color: c.$lighter_blue;
           padding-inline: 20px;
           border-radius: 20px;
           padding-bottom: 10px;
@@ -296,7 +308,7 @@
     padding: 20px;
     background-color: white;
     border-radius: 15px;
-    /*     box-shadow: 2px 2px 10px c.$light_yellow;
+    /*     box-shadow: 2px 2px 10px c.$light_blue;
  */
     min-height: 150px; /* biztosítja, hogy a footer ne legyen túl kicsi */
     height: auto;
@@ -341,13 +353,13 @@
           transition: all 0.2s ease-in-out;
 
           &.filled {
-            color: c.$yellow; /* Ki van töltve: arany szín */
+            color: c.$blue; /* Ki van töltve: arany szín */
           }
 
           &:hover,
           &.hovered {
             color: c.$hover-color;
-            text-shadow: 2px 2px 5px c.$light_yellow;
+            text-shadow: 2px 2px 5px c.$light_blue;
           }
         }
       }
@@ -395,5 +407,15 @@ app-authentication-warning {
 
   .header-right {
     margin-top: 20px;
+  }
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    button {
+      width: 50%;
+      margin-bottom: 10px;
+    }
   }
 }

@@ -1,7 +1,7 @@
 <div class="profile-container">
   <div class="left col-lg-3 col-md-4 col-sm-12">
     <app-user-data
-      [user]="user()!"
+      [user]="userProfile()!"
       [userReceiptsLikes]="userReceiptsLikes()"
       [customerOwnProfile]="customerOwnProfile()"
       (createEvent)="createReceipt($event)"
@@ -9,78 +9,7 @@
     </app-user-data>
   </div>
   <div class="right col-lg-9 col-md-8 col-sm-12">
-    <div class="menu">
-      <div class="menu-buttons">
-        @for (item of menuItems; track item.name) {
-          <button
-            type="button"
-            (click)="onMenuItemClick(item.name)"
-            [ngClass]="{ active: item.name === activeMenu() }"
-          >
-            {{ item.label }}
-          </button>
-        }
-      </div>
-      <div class="menu-dropdown">
-        <div class="custom-select">
-          <div
-            class="custom-select-input"
-            [ngClass]="{ active: isDropdownOpen }"
-            (click)="toggleDropdown()"
-            (keyup.enter)="toggleDropdown()"
-            tabindex="0"
-          >
-            <div class="text-container">
-              {{ selectedMenuItem ? selectedMenuItem.label : "Menü kiválasztása" }}
-            </div>
-            <div class="icon-container">
-              <i
-                class="fa-solid"
-                [ngClass]="{
-                  'fa-sort-up': isDropdownOpen,
-                  'fa-sort-down': !isDropdownOpen,
-                }"
-              ></i>
-            </div>
-            <div class="custom-dropdown-menu recipe-menu" *ngIf="isDropdownOpen">
-              <ul>
-                @for (item of menuItems; track item.name) {
-                  <li
-                    [ngClass]="{ 'active-item': item.name === activeMenu() }"
-                    (click)="onDropdownMenuItemClick(item.name)"
-                    tabindex="0"
-                    (keyup)="onDropdownMenuItemClick(item.name)"
-                  >
-                    {{ item.label }}
-                  </li>
-                }
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <app-user-receipts
-      [activeMenu]="activeMenu()"
-      [userSavedReceipts]="userSavedReceipts()"
-      [menuList]="menuList()"
-      [userCollections]="userCollections()"
-      [clickedFolder]="clickedFolder()"
-      [user]="user()!"
-      [isOwnPage]="customerOwnProfile()"
-      (folderClicked)="onFolderClick($event)"
-      (navigateToReceipt)="navigateToReceipt($event)"
-      (clickedFolderChange)="clickedFolder.set(null)"
-      (editReceipt)="setEditedRecipt($event)"
-    >
+    <app-user-receipts [user]="userProfile()!" [isOwnPage]="customerOwnProfile()">
     </app-user-receipts>
   </div>
 </div>
-@if (editedRecipt) {
-  <app-recipe-create
-    [user]="user()!"
-    [existingReceipt]="editedRecipt"
-    (updateEvent)="updateRecipe($event)"
-    (closeEvent)="editedRecipt = null"
-  ></app-recipe-create>
-}

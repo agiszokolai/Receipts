@@ -1,10 +1,11 @@
 @use "bootstrap/scss/bootstrap.scss";
 @use "assets/styles/styles";
+@use "assets/styles/variables/colors" as c;
 @import url("https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap");
 
 html,
 body {
-  background: rgb(246, 230, 202) !important;
+  background: c.$light_blue !important;
   height: 100vh;
   font-family: "Merriweather", serif !important;
   font-weight: 300;
@@ -12,6 +13,7 @@ body {
   color: black;
   line-height: 1.6;
   overflow-y: auto;
+  scroll-behavior: smooth !important;
 }
 
 body {

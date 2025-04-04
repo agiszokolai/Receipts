@@ -25,11 +25,13 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'receptek',
-    pathMatch: 'full',
+    loadComponent: () =>
+      import('./components/landing-page/landing-page.component').then(
+        (c) => c.LandingPageComponent,
+      ),
   },
   {
     path: '**',
-    redirectTo: 'receptek',
+    redirectTo: '',
   },
 ];

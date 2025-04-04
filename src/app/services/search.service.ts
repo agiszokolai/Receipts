@@ -1,65 +1,114 @@
 import { effect, Injectable, signal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { IReceipt } from '../model/receipt';
+import { ISearch } from '../model/shared';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SearchService {
-  private originalList = new BehaviorSubject<any[]>([]);
+  private originalList = new BehaviorSubject<IReceipt[]>([]);
   originalList$ = this.originalList.asObservable();
 
-  private filteredListSubject = new BehaviorSubject<any[]>([]);
+  private filteredListSubject = new BehaviorSubject<IReceipt[]>([]);
   filteredList$ = this.filteredListSubject.asObservable();
 
-  searchedText = signal('');
-  selectedCategories = signal<string[]>([]);
+  searchData = signal<ISearch>({
+    searchText: '',
+    categories: [],
+    difficulties: [],
+    prepTime: [],
+    rating: [],
+  });
 
   constructor() {
     effect(() => {
-      this.applyFilter(
-        this.originalList.getValue(),
-        this.searchedText(),
-        this.selectedCategories(),
-      );
+      this.applyFilter(this.originalList.getValue(), this.searchData());
     });
   }
 
   // Beállítja az eredeti listát
-  setOriginalList(newList: any[]) {
-    this.originalList.next(newList);
+  setOriginalList(newList: IReceipt[]) {
+    //receptre váltáskor majd vissza így marad meg az adat
+    if (this.filteredListSubject.getValue().length === 0) {
+      this.originalList.next(newList);
+      this.filteredListSubject.next(newList);
+    } else {
+      const updatedFilteredList = this.filteredListSubject.getValue().map((item) => {
+        const updatedItem = newList.find((r) => r.id === item.id);
+        return updatedItem ? { ...item, ...updatedItem } : item;
+      });
+
+      this.filteredListSubject.next(updatedFilteredList);
+    }
   }
 
   // szűrt lista
-  setFilteredList(list: any[]): void {
+  setFilteredList(list: IReceipt[]): void {
     this.filteredListSubject.next(list);
   }
 
-  // Keresési szöveg változik
-  changeSearchText(value: string) {
-    this.searchedText.set(value);
+  changeSearchData(updatedValues: Partial<ISearch>) {
+    this.searchData.set({
+      ...this.searchData(),
+      ...updatedValues,
+    });
   }
-
-  // Kiválasztott kategóriák változnak
-  changeSelectedCategories(categories: string[]) {
-    this.selectedCategories.set(categories);
-  }
-
-  // Szűrés
-  private applyFilter(list: any[], searchText: string, categories: string[]) {
+  /**
+   * Szűrés beállítása
+   * @param list A lista ammiben szűrni kell
+   * @param search Szűrési értékek
+   */
+  private applyFilter(list: IReceipt[], search: ISearch) {
     let filteredList = list;
 
-    if (categories.length > 0) {
+    /* Ha van kategória */
+    if (search.categories.length > 0) {
       filteredList = filteredList.filter((item) =>
-        categories.some((category) => item.category.includes(category)),
+        search.categories.some((category) => item.category.includes(category)),
       );
     }
 
-    if (searchText.trim() !== '') {
+    /* Ha van nehézség */
+    if (search.difficulties.length > 0) {
       filteredList = filteredList.filter((item) =>
-        item.name.toLowerCase().includes(searchText.toLowerCase()),
+        search.difficulties.some((difficulty) => item.difficulty.includes(difficulty)),
       );
     }
 
-    this.setFilteredList(filteredList); // Hívjuk a setFilteredList-t, hogy biztosítsuk a frissítést
+    /* Ha van elkészítési idő */
+    if (search.prepTime.length > 0 && !search.prepTime.includes('Mind')) {
+      filteredList = filteredList.filter((item) => {
+        const totalTime = item.prepTime + (item.cookingTime || 0);
+
+        if (search.prepTime.includes('Gyors')) {
+          return totalTime <= 30;
+        } else if (search.prepTime.includes('Közepes')) {
+          return totalTime <= 60 && totalTime > 30;
+        } else if (search.prepTime.includes('Hosszadalmas')) {
+          return totalTime > 60;
+        }
+
+        return false;
+      });
+    }
+
+    /* Ha van értékelés */
+    if (search.rating.length > 0) {
+      filteredList = filteredList.filter((item) =>
+        search.rating.includes(Number(item.averageRating).toString()),
+      );
+    }
+
+    /* Ha van keresési szöveg szűr a név és a tagek alapján */
+    if (search.searchText.trim() !== '') {
+      filteredList = filteredList.filter(
+        (item) =>
+          item.name.toLowerCase().includes(search.searchText) ||
+          item.tags.some((tag) => tag.toLowerCase().includes(search.searchText)),
+      );
+    }
+
+    this.setFilteredList(filteredList);
   }
 }

@@ -7,3 +7,11 @@ export class SubMenuItem {
     this.name = name;
   }
 }
+
+export interface ISearch {
+  searchText: string;
+  categories: string[];
+  difficulties: string[];
+  prepTime: string[];
+  rating: string[];
+}

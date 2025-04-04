@@ -6,13 +6,13 @@ import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { emailValidator, passwordConfirmValidator } from '../../../helpers/validators';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-registration',
   standalone: true,
   imports: [ModalComponent, CommonModule, ReactiveFormsModule],
   templateUrl: './registration.component.html',
-  styleUrl: './registration.component.scss',
 })
 export class RegistrationComponent {
   isRegistrationModalOpen = input(false);
@@ -29,6 +29,7 @@ export class RegistrationComponent {
 
   private userService = inject(UserService);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   /**
    *  Reisztráció
@@ -43,9 +44,11 @@ export class RegistrationComponent {
       .subscribe({
         next: () => {
           this.closeModal();
+          this.toastr.success('Sikeres regisztráció!');
           this.router.navigate(['/profil', formData.username]);
         },
         error: (error) => {
+          this.toastr.warning('Hiba történt a regisztráció során');
           console.log('Hiba történt:', error.message);
         },
       });

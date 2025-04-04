@@ -9,6 +9,18 @@ export interface IUser {
   receipts: IUserReceipts;
 }
 
+export interface IUserReceipts {
+  saved: number[];
+  liked: number[];
+  created: number[];
+  collections?: ISavedReceiptCollection[];
+}
+
+export interface ISavedReceiptCollection {
+  id: number;
+  name: string;
+  receipts: number[];
+}
 export interface IlogIn {
   email: string;
   password: string;
@@ -18,17 +30,4 @@ export interface IUserRegistration {
   password: string;
   name: string;
   userName: string;
-}
-
-export interface IUserReceipts {
-  saved: number[];
-  liked: number[];
-  created: number[];
-  collections?: ISavedReceiptCollection[];
-}
-
-export interface ISavedReceiptCollection {
-  id: string;
-  name: string;
-  receipts: number[];
 }

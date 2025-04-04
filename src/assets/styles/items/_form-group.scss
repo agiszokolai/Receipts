@@ -31,11 +31,11 @@
     background-color: transparent;
 
     &:focus {
-      border-bottom: 2px solid #faaf3e;
+      border-bottom: 2px solid c.$blue;
       ~ label {
         font-size: 14px;
         top: -20px;
-        color: #faaf3e;
+        color: c.$blue;
       }
     }
 
@@ -51,7 +51,7 @@
       ~ label {
         font-size: 14px;
         top: -20px;
-        color: #faaf3e;
+        color: c.$blue;
       }
     }
   }
@@ -64,12 +64,12 @@
     background-color: transparent;
 
     &:focus {
-      border: 2px solid #faaf3e;
+      border: 2px solid c.$blue;
       outline-color: rgba(121, 120, 120, 0.781);
       ~ label {
         font-size: 14px;
         top: -22px;
-        color: #faaf3e;
+        color: c.$blue;
       }
     }
 
@@ -85,7 +85,7 @@
       ~ label {
         font-size: 14px;
         top: -22px;
-        color: #faaf3e;
+        color: c.$blue;
       }
     }
 
@@ -117,7 +117,7 @@
   &.active,
   &:focus {
     box-shadow: none;
-    border: 2px solid #faaf3e;
+    border: 2px solid c.$blue;
   }
 
   .text-container {

@@ -1,7 +1,10 @@
 <div class="receipt-container">
   <div class="receipt-header">
     <div class="header-left col-lg-6 col-md-12 col-sm-12">
-      <img [src]="receipt.imageUrl" [alt]="receipt!.name" />
+      <button (click)="navigateBack()" (keyup)="navigateBack()" tabindex="0">
+        <i class="fa-solid fa-angle-left me-2"></i>Vissza
+      </button>
+      <img [src]="receipt.imageUrl" [alt]="receipt.name" />
       <div class="category-difficulty-container">
         <span class="category">{{ receipt.category }}</span>
         <span
@@ -52,7 +55,11 @@
       </div>
       <div>
         <div class="receipt-save">
-          <button class="btn" [ngClass]="{ saved: isSaved() }" (click)="onSavedClick(!isSaved())">
+          <button
+            class="btn"
+            [ngClass]="{ saved: isSaved() }"
+            (click)="updateUserReceipt('save', !isSaved())"
+          >
             <i
               class="fa-bookmark me-2"
               [ngClass]="{
@@ -72,8 +79,8 @@
                 'fa-solid': isLiked() || isHeartHovered,
                 'fa-regular': !(isLiked() || isHeartHovered),
               }"
-              (click)="onLikedClick(!isLiked())"
-              (keyup)="onLikedClick(!isLiked())"
+              (click)="updateUserReceipt('like', !isLiked())"
+              (keyup)="updateUserReceipt('like', !isLiked())"
               (mouseenter)="isHeartHovered = true"
               (mouseleave)="isHeartHovered = false"
             ></i>
@@ -83,7 +90,7 @@
     </div>
   </div>
   <div class="receipt-body">
-    <div class="d-flex align-items-center flex-column">
+    <div class="d-flex align-items-center flex-column w-100">
       <h4 class="text-center">Leírás</h4>
       <div class="w-85">
         <p class="justify-text">{{ receipt.description }}</p>
@@ -159,4 +166,13 @@
     [isModalOpen]="isModalOpen()"
     (closeModal)="isModalOpen.set(false)"
   ></app-authentication-warning-modal>
+}
+@if (isSaveModalOpen()) {
+  <app-save-recipe
+    [isModalOpen]="isSaveModalOpen()"
+    [user]="user()!"
+    [recipe]="receipt"
+    (closeEvent)="this.isSaveModalOpen.set(false)"
+    (saveEvent)="handleSaveEvent($event)"
+  ></app-save-recipe>
 }

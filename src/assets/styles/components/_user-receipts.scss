@@ -8,11 +8,10 @@
     margin: 0 0 15px;
     padding: 5px 0px;
     font-size: 0.9rem;
-    background-color: c.$yellow;
+    background-color: c.$blue;
 
     &:before {
       width: 0%;
-      background-color: #faaf3e;
     }
 
     &:hover {
@@ -33,7 +32,7 @@
   overflow-y: auto;
 
   i {
-    color: #faaf3e;
+    color: c.$blue;
     font-size: 2rem;
   }
 
@@ -72,7 +71,7 @@
   flex-direction: row;
   cursor: pointer;
   i {
-    color: #faaf3e;
+    color: c.$blue;
     font-size: 2rem;
     transition: transform 0.5s ease-in-out;
     /*  &:hover {

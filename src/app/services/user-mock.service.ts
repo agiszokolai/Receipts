@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LOGIN_DATA, MOCK_USERDATA } from '../mocks/mock-user-data';
-import { IUser } from '../model/user';
+import { IUser, IUserReceipts } from '../model/user';
 import { BehaviorSubject, catchError, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -122,7 +122,7 @@ export class UserMockService {
     return of(newUser);
   }
 
-  addLikedReceipt(userId: number, receptId: number): Observable<IUser | undefined> {
+  addLikedReceipt(userId: string, receptId: number): Observable<IUser | undefined> {
     const userIndex = MOCK_USERDATA.findIndex((u) => u.userId === userId.toString());
 
     if (userIndex !== -1) {
@@ -143,7 +143,7 @@ export class UserMockService {
     return of(undefined);
   }
 
-  removeLikedReceipt(userId: number, receptId: number): Observable<IUser | undefined> {
+  removeLikedReceipt(userId: string, receptId: number): Observable<IUser | undefined> {
     const userIndex = MOCK_USERDATA.findIndex((u) => u.userId === userId.toString());
 
     if (userIndex !== -1) {
@@ -160,36 +160,50 @@ export class UserMockService {
     return of(undefined);
   }
 
-  addSavedReceipt(userId: number, receptId: number): Observable<IUser | undefined> {
-    const userIndex = MOCK_USERDATA.findIndex((u) => u.userId === userId.toString());
+  addSavedReceipt(
+    userId: string,
+    receptId: number,
+    collectionId?: number,
+  ): Observable<IUserReceipts | undefined> {
+    const userIndex = MOCK_USERDATA.findIndex((u) => u.userId === userId);
 
     if (userIndex !== -1) {
       const user = { ...MOCK_USERDATA[userIndex] };
 
-      // Ha nincs inicializálva, hozzunk létre egy üres tömböt
-      user.receipts.saved = user.receipts.saved ? [...user.receipts.saved] : [];
+      if (!collectionId) {
+        user.receipts.saved = user.receipts.saved ?? [];
 
-      // Ellenőrizzük, hogy már benne van-e
-      if (!user.receipts.saved.includes(receptId)) {
-        user.receipts.saved.push(receptId);
+        if (!user.receipts.saved.includes(receptId)) {
+          user.receipts.saved = [...user.receipts.saved, receptId];
+        }
+      } else {
+        const collection = user.receipts.collections?.find((c) => c.id === collectionId);
+
+        if (collection) {
+          if (!collection.receipts.includes(receptId)) {
+            collection.receipts = [...collection.receipts, receptId];
+          }
+        }
       }
 
+      // Frissítjük a felhasználót a MOCK_USERDATA-ban
       MOCK_USERDATA[userIndex] = user;
 
-      return of(user);
+      return of(user.receipts);
     }
     return of(undefined);
   }
 
-  removeSavedReceipt(userId: number, receptId: number): Observable<IUser | undefined> {
+  removeSavedReceipt(userId: string, receptId: number): Observable<IUser | undefined> {
     const userIndex = MOCK_USERDATA.findIndex((u) => u.userId === userId.toString());
 
     if (userIndex !== -1) {
       const user = { ...MOCK_USERDATA[userIndex] };
 
-      user.receipts.saved = user.receipts.saved
-        ? user.receipts.saved.filter((id) => id !== receptId)
-        : [];
+      user.receipts.saved = user.receipts.saved.filter((id) => id !== receptId);
+      user.receipts.collections?.forEach((collection) => {
+        collection.receipts = collection.receipts.filter((id) => id !== receptId);
+      });
 
       MOCK_USERDATA[userIndex] = user;
 

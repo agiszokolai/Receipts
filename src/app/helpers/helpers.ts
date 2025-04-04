@@ -22,3 +22,32 @@ export function formatDateWithMoment(
 
   return defaultValue;
 }
+export function getFilterLabel(type: string): string {
+  switch (type) {
+    case 'categories':
+      return 'Kategória';
+    case 'difficulties':
+      return 'Nehézség';
+    case 'rating':
+      return 'Értékelés';
+    case 'prepTime':
+      return 'Elkészítés';
+    default:
+      return type;
+  }
+}
+
+export function getPrepTimeCategory(cookingTime: string) {
+  switch (cookingTime) {
+    case '0':
+      return ['Mind', 'Gyors', 'Közepes', 'Hosszadalmas'];
+    case '1':
+      return ['Gyors'];
+    case '2':
+      return ['Közepes'];
+    case '3':
+      return ['Hosszadalmas'];
+    default:
+      return [];
+  }
+}

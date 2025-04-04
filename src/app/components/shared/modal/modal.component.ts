@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, input, Output, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, input, Output, TemplateRef } from '@angular/core';
 
 import { IlogIn, IUserRegistration } from '../../../model/user';
 import { FormGroup } from '@angular/forms';
@@ -21,7 +21,7 @@ export class ModalComponent {
   /**  Fejlécben megjelenő cím */
   header = input<string>();
 
-  @Input() formGroup!: FormGroup;
+  formGroup = input<FormGroup>();
 
   /**  A submit gombon megjelenő szöveg */
   footerButtonLabel = input('');
@@ -29,7 +29,7 @@ export class ModalComponent {
   /**  Látszódik-e a mégse gomb */
   isFooterCancelVisible = input(false);
 
-  @Input() formTemplate!: TemplateRef<any>;
+  formTemplate = input<TemplateRef<any>>();
 
   /** Esemény, amely értesíti a szülő komponenst a modal bezárásáról*/
   @Output() closeEvent = new EventEmitter<any>();
@@ -37,9 +37,9 @@ export class ModalComponent {
   @Output() submitEvent = new EventEmitter<IlogIn | IUserRegistration>();
 
   onSubmit() {
-    if (this.formGroup.valid) {
-      console.log(this.formGroup.value);
-      this.submitEvent.emit(this.formGroup.value);
+    if (this.formGroup() && this.formGroup()?.valid) {
+      console.log(this.formGroup()?.value);
+      this.submitEvent.emit(this.formGroup()?.value);
     }
   }
 

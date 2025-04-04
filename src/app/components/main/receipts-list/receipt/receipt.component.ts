@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ReceiptsService } from '../../../../services/receipts.service';
-import { of, ReplaySubject, switchMap, take, takeUntil } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, of, ReplaySubject, switchMap, take, takeUntil } from 'rxjs';
+import { Router } from '@angular/router';
 import { IUser } from '../../../../model/user';
 import { UserService } from '../../../../services/user.service';
 import { CommonModule } from '@angular/common';
@@ -9,11 +9,10 @@ import { IReceipt, IReview } from '../../../../model/receipt';
 import { FadeDirective } from '../../../../directives/fade.directive';
 import { formatDateWithMoment } from '../../../../helpers/helpers';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { ModalComponent } from '../../../shared/modal/modal.component';
-import { LoginComponent } from '../../../user/login/login.component';
-import { RegistrationComponent } from '../../../user/registration/registration.component';
 import { AuthenticationWarningModalComponent } from '../../../shared/modal/authentication-warning-modal/authentication-warning-modal.component';
 import { blankFood } from '../../../../helpers/constants';
+import { SearchService } from '../../../../services/search.service';
+import { SaveRecipeComponent } from '../save-recipe/save-recipe.component';
 
 @Component({
   selector: 'app-receipt',
@@ -22,13 +21,10 @@ import { blankFood } from '../../../../helpers/constants';
     CommonModule,
     FadeDirective,
     ToastrModule,
-    ModalComponent,
-    LoginComponent,
-    RegistrationComponent,
     AuthenticationWarningModalComponent,
+    SaveRecipeComponent,
   ],
   templateUrl: './receipt.component.html',
-  styleUrls: ['./receipt.component.scss'],
 })
 export class ReceiptComponent implements OnInit, OnDestroy {
   /** Recept adatai */
@@ -46,6 +42,7 @@ export class ReceiptComponent implements OnInit, OnDestroy {
   /** A recept mentett állapota */
   isSaved = signal(false);
   isModalOpen = signal(false);
+  isSaveModalOpen = signal(false);
   isLoginModalOpen = signal(false);
   isRegistrationModalOpen = signal(false);
 
@@ -66,6 +63,9 @@ export class ReceiptComponent implements OnInit, OnDestroy {
 
   likes = 0;
 
+  receiptId = 0;
+  filterdReceipts$!: Observable<IReceipt[]>;
+
   /** Az elérhető csillagok száma */
   stars: number[] = [1, 2, 3, 4, 5];
 
@@ -73,21 +73,22 @@ export class ReceiptComponent implements OnInit, OnDestroy {
 
   private receiptService = inject(ReceiptsService);
   private userService = inject(UserService);
-  private route = inject(ActivatedRoute);
+  private searchService = inject(SearchService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
 
   ngOnInit(): void {
-    let receiptName = '';
-    this.route.paramMap.pipe(take(1)).subscribe((params) => {
-      receiptName = params.get('name') ?? '';
-    });
-    // Először lekérjük a bejelentkezett felhasználót
+    this.receiptId = history.state.id;
+    this.filterdReceipts$ = this.searchService.filteredList$;
+
     this.userService.user$.pipe(takeUntil(this.destroyed$)).subscribe({
       next: (u) => {
         this.user.set(u);
-        if (receiptName) {
-          this.getReceiptData(receiptName);
+
+        if (this.receiptId) {
+          this.getReceiptData(this.receiptId);
+        } else {
+          this.router.navigate(['receptek']);
         }
 
         if (!u) {
@@ -97,15 +98,35 @@ export class ReceiptComponent implements OnInit, OnDestroy {
         }
       },
     });
+
+    this.router.events.subscribe(() => {
+      const newId = history.state.id;
+      if (newId && newId !== this.receiptId) {
+        this.receiptId = newId;
+        this.getReceiptData(this.receiptId); // Új adatok betöltése
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
+
+  handleSaveEvent(updatedUser: IUser) {
+    this.isSaveModalOpen.set(false);
+    this.user.set(updatedUser);
+    this.getReceiptStateForUser();
+    // Itt frissítheted a szülő komponens állapotát a frissített adatokkal
   }
 
   /**
    * Lekérjük a recept adatait név alapján
    * @param name A recept neve (slug)
    */
-  getReceiptData(name: string): void {
+  getReceiptData(id: number): void {
     this.receiptService
-      .getReceiptByName(name)
+      .getReceiptById(id)
       .pipe(
         switchMap((receipt) => {
           if (receipt) {
@@ -117,8 +138,6 @@ export class ReceiptComponent implements OnInit, OnDestroy {
             });
 
             this.receipt.createdAt = date;
-            console.log(receipt);
-
             /*  this.rating = receipt.averageRating ?? 0; */
 
             /*   this.rating =
@@ -157,76 +176,73 @@ export class ReceiptComponent implements OnInit, OnDestroy {
    * Ellenőrzi, hogy a felhasználó kedveli-e vagy mentette-e a receptet és mennyire értékelte
    */
   getReceiptStateForUser(): void {
-    const userReceipts: { liked?: number[]; saved?: number[] } = this.user()?.receipts ?? {};
-    this.isLiked.set(userReceipts.liked?.includes(this.receipt.id) ?? false);
-    this.isSaved.set(userReceipts.saved?.includes(this.receipt.id) ?? false);
+    this.isLiked.set(this.user()?.receipts?.liked?.includes(this.receipt.id) ?? false);
+    this.isSaved.set(
+      (this.user()?.receipts?.saved?.includes(this.receipt.id) ||
+        this.user()?.receipts?.collections?.some((collection) =>
+          collection.receipts.includes(this.receipt.id),
+        )) ??
+        false,
+    );
+
     this.rating =
       this.receipt.reviews?.find((review) => review.userId === this.user()!.userId)?.rating ?? 0;
   }
 
   /**
-   * Kedvelés változtatása
-   * @param liked Ha true, akkor kedveli a receptet, ha false, akkor leveszi a kedvencből
+   * Recept állapotának megváloztatása, kedvelte-e vagy lájkolta-e a felhasználó
+   * @param action kedvelés vagy mentés
+   * @param add be vagy kikedvelte, mentette vagy kivette-e a mentések közül
+   * @returns
    */
-  onLikedClick(liked: boolean): void {
+  updateUserReceipt(action: 'like' | 'save', add: boolean): void {
     if (!this.user()) {
       this.isModalOpen.set(true);
-
       return;
     }
-    if (liked) {
-      if (this.user()) {
-        this.userService.addLikedReceipt(Number(this.user()!.userId), this.receipt.id).subscribe({
-          next: () => {
-            this.isLiked.set(true);
-          },
-          error: (err) => {
-            console.error('Hiba történt a recept kedvelése közben:', err);
-          },
-        });
+    const userId = this.user()!.userId;
+    const receiptId = this.receipt.id;
+    if (action === 'save') {
+      if (add) {
+        this.isSaveModalOpen.set(true);
+      } else {
+        this.userService
+          .removeSavedReceipt(userId, receiptId)
+          .pipe(take(1))
+          .subscribe({
+            next: (updatedUser) => {
+              if (updatedUser) {
+                this.isSaved.set(false);
+                this.userService.updateUser(updatedUser);
+                this.toastr.success('Sikeresen kikerült a recept a mentettek közül');
+              }
+            },
+            error: () => {
+              console.error('Hiba történt a recept állapotának megváltoztatása közben:');
+            },
+          });
       }
     } else {
-      this.userService.removeLikedReceipt(Number(this.user()!.userId), this.receipt.id).subscribe({
-        next: () => {
-          this.isLiked.set(false);
+      // Ha kedvelés történik, akkor a service hívás folytatódik
+
+      const serviceCall = add
+        ? this.userService.addLikedReceipt(userId, receiptId)
+        : this.userService.removeLikedReceipt(userId, receiptId);
+
+      serviceCall.pipe(take(1)).subscribe({
+        next: (updatedUser) => {
+          if (updatedUser) {
+            this.isLiked.set(add);
+            this.userService.updateUser(updatedUser);
+          }
         },
         error: (err) => {
-          console.error('Hiba történt a recept kedvelésének eltávolítása közben:', err);
+          console.error('Hiba történt a recept állapotának megváltoztatása közben:', err);
         },
       });
     }
   }
 
-  /**
-   * Mentés változtatása
-   * @param saved Ha true, akkor elmenti a receptet, ha false, akkor leveszi a mentettből
-   */
-  onSavedClick(saved: boolean): void {
-    if (!this.user()) {
-      this.isModalOpen.set(true);
-
-      return;
-    }
-    if (saved) {
-      this.userService.addSavedReceipt(Number(this.user()!.userId), this.receipt.id).subscribe({
-        next: () => {
-          this.isSaved.set(true);
-        },
-        error: (err) => {
-          console.error('Hiba történt a recept mentése közben:', err);
-        },
-      });
-    } else {
-      this.userService.removeSavedReceipt(Number(this.user()!.userId), this.receipt.id).subscribe({
-        next: () => {
-          this.isSaved.set(false);
-        },
-        error: (err) => {
-          console.error('Hiba történt a recept mentett állapotának eltávolítása közben:', err);
-        },
-      });
-    }
-  }
   /**
    * Az értékelés beállítása
    * @param star Az értékelés csillagjainak száma
@@ -239,10 +255,7 @@ export class ReceiptComponent implements OnInit, OnDestroy {
     }
 
     // Ha a rating változik, akkor meg kell jeleníteni a mentés gombot
-    if (this.rating !== star) {
-      this.isRatingChanged = true;
-    }
-
+    this.isRatingChanged = this.rating !== star;
     this.rating = star;
   }
 
@@ -318,18 +331,18 @@ export class ReceiptComponent implements OnInit, OnDestroy {
    * Az átlagos értékelés frissítése
    */
   updateAverageRating(): void {
-    if (this.receipt.reviews) {
-      const totalRatings = this.receipt.reviews.reduce((acc, review) => acc + review.rating, 0);
-      this.receipt.averageRating = totalRatings / this.receipt.reviews.length;
-    }
+    const reviews = this.receipt.reviews ?? [];
+    this.receipt.averageRating =
+      reviews.length > 0
+        ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+        : 0;
   }
 
   navigateToCreator() {
     this.router.navigate(['/profil', this.creator.username]);
   }
 
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
+  navigateBack() {
+    this.router.navigate([history.state.direction]);
   }
 }

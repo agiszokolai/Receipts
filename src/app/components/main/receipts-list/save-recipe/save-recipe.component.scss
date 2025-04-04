@@ -1,0 +1,98 @@
+@use "../../../../../assets/styles/variables/colors" as c;
+
+.saveRecipe {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20% 0 0;
+  width: 100%;
+}
+
+.footer {
+  margin-top: auto !important;
+}
+.radio-options {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+
+  label {
+    padding-block: 5px;
+  }
+  padding-bottom: 15px;
+}
+.collections {
+  padding-block: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+
+  .span-header {
+    padding-bottom: 10px;
+  }
+
+  .select-box {
+    background: c.$light_blue;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border: 1px solid c.$blue;
+    border-radius: 10px;
+    padding-block: 5px;
+    cursor: pointer;
+    position: relative;
+    width: 200px;
+
+    span {
+      text-align: center;
+      padding-inline: 20px;
+    }
+    i {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    &.open i {
+      transform: rotate(-180deg);
+    }
+  }
+
+  .options {
+    position: relative;
+    width: 100%;
+    top: -3%;
+    background: c.$light_blue;
+    border: 1px solid c.$blue;
+    border-radius: 10px;
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 12;
+
+    li {
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        background: mix(white, c.$light_blue, 50%);
+        color: c.$dark_blue;
+      }
+
+      &:first-child {
+        border-radius: 10px 10px 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 10px 10px;
+      }
+
+      &.selected {
+        font-weight: bold;
+        color: c.$dark_blue;
+        background: mix(white, c.$light_blue, 50%);
+      }
+    }
+  }
+}

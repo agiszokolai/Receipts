@@ -164,6 +164,7 @@ export const MOCK_RECEIPTS: IReceipt[] = [
       'diétás',
       'kedvenc',
       'olcsó',
+      'recept',
     ],
     difficulty: DifficultyEnum.Hard,
     description:
@@ -173,7 +174,8 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     servings: 2,
     /* imageUrl: '../../assets/images/grilled-chicken-salad.jpg', */
     imageUrl: '',
-    createdAt: new Date().toISOString(),
+    createdAt: '2025-03-01 15:25:20',
+
     createdById: 1,
     reviews: [
       {
@@ -336,7 +338,7 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     cookingTime: 30,
     servings: 4,
     imageUrl: '../../assets/images/chili-con-carne.jpg',
-    createdAt: new Date().toISOString(),
+    createdAt: '2024-03-01 15:25:20',
     createdById: 1,
     reviews: [
       {
@@ -367,7 +369,7 @@ export const MOCK_RECEIPTS: IReceipt[] = [
       fiber: 2.5,
       sugar: 1.25,
     },
-    likes: 0,
+    likes: 10,
     saves: 0,
   },
   {
@@ -456,7 +458,8 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     cookingTime: 45,
     servings: 6,
     imageUrl: '../../assets/images/lasagne.jpg',
-    createdAt: new Date().toISOString(),
+    createdAt: '2024-12-11 15:25:20',
+
     createdById: 2,
     reviews: [
       {
@@ -571,7 +574,8 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     cookingTime: 15,
     servings: 2,
     imageUrl: '../../assets/images/vegan-burger.jpeg',
-    createdAt: new Date().toISOString(),
+    createdAt: '2023-03-01 15:25:20',
+
     createdById: 3,
     reviews: [
       {
@@ -667,7 +671,8 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     cookingTime: 10,
     servings: 2,
     imageUrl: '../../assets/images/banana-pancake.jpg',
-    createdAt: new Date().toISOString(),
+    createdAt: '2024-04-28 15:25:20',
+
     createdById: 3,
     reviews: [
       {
@@ -782,7 +787,8 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     cookingTime: 20,
     servings: 2,
     imageUrl: '../../assets/images/carbonara.jpg',
-    createdAt: new Date().toISOString(),
+    createdAt: '2025-04-01 15:25:20',
+
     createdById: 2,
     reviews: [
       {
@@ -893,7 +899,8 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     cookingTime: 30,
     servings: 4,
     imageUrl: '../../assets/images/vegetable-soup.jpeg',
-    createdAt: new Date().toISOString(),
+    createdAt: '2020-03-01 15:25:20',
+
     createdById: 1,
     reviews: [
       {
@@ -986,14 +993,14 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     ],
     steps: ['Pucold meg az édesburgonyát', 'Vágd fel és süsd meg olívaolajjal'],
     category: CategoryEnum.SideDish,
-    tags: ['vegan', 'healthy'],
+    tags: ['vegan', 'healthy', 'recept'],
     difficulty: DifficultyEnum.Easy,
     description: 'Finom és tápláló sült édesburgonya.',
     prepTime: 10,
     cookingTime: 25,
     servings: 3,
     imageUrl: '../../assets/images/sweet-potato.jpg',
-    createdAt: new Date().toISOString(),
+    createdAt: '2020-01-01 15:25:20',
     createdById: 3,
     reviews: [
       {
@@ -1096,14 +1103,15 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     ],
     steps: ['Készítsd el a tésztát', 'Tedd bele a szilvát', 'Süsd meg a pitét'],
     category: CategoryEnum.Dessert,
-    tags: ['vegetarian', 'sweet'],
+    tags: ['vegetarian', 'sweet', 'recept'],
     difficulty: DifficultyEnum.Medium,
     description: 'Finom szilvás pite, könnyű tészta és friss gyümölcs.',
     prepTime: 15,
     cookingTime: 45,
     servings: 8,
     imageUrl: '../../assets/images/plum-pie.jpg',
-    createdAt: new Date().toISOString(),
+    createdAt: '2019-10-16 15:25:20',
+
     createdById: 2,
     reviews: [
       {
@@ -1216,14 +1224,15 @@ export const MOCK_RECEIPTS: IReceipt[] = [
     ],
     steps: ['Tedd az összes hozzávalót turmixgépbe', 'Keverd össze', 'Tálald granolával'],
     category: CategoryEnum.Breakfast,
-    tags: ['healthy', 'vegan'],
+    tags: ['healthy', 'vegan', 'recept'],
     difficulty: DifficultyEnum.Easy,
     description: 'Tökéletes reggeli vagy édesség a smoothie és granola szerelmeseinek.',
     prepTime: 5,
     cookingTime: 0,
     servings: 1,
     imageUrl: '../../assets/images/smoothie-bowl.jpg',
-    createdAt: new Date().toISOString(),
+    createdAt: '2022-08-01 15:25:20',
+
     createdById: 2,
     reviews: [
       {
@@ -1255,7 +1264,7 @@ export const MOCK_RECEIPTS: IReceipt[] = [
       fiber: 6,
       sugar: 22,
     },
-    likes: 0,
-    saves: 0,
+    likes: 500,
+    saves: 12,
   },
 ];

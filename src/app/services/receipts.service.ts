@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { IReceipt, IReview } from '../model/receipt';
+import { IUser } from '../model/user';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +21,7 @@ export class ReceiptsService {
     return of([]);
   }
 
-  createReceipt(newReceipt: IReceipt): Observable<IReceipt | null> {
+  createReceipt(newReceipt: IReceipt, user: IUser): Observable<IUser | null> {
     return of(null);
   }
 

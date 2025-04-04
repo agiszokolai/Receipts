@@ -12,7 +12,7 @@ export interface IReceipt {
   difficulty: DifficultyEnum;
   category: string;
   tags: string[];
-  imageUrl?: string;
+  imageUrl: string;
   nutrition?: INutrition;
   nutritionPerServing?: INutrition;
   createdAt: string;
@@ -21,6 +21,8 @@ export interface IReceipt {
   averageRating: number;
   likes: number;
   saves: number;
+  isSavedByUser?: boolean;
+  isLikedByUser?: boolean;
 }
 export interface IIngredientSection {
   sectionName: string; // Pl. "Tészta", "Krém", "Máz"

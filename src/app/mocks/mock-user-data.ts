@@ -30,14 +30,19 @@ export const MOCK_USERDATA: IUser[] = [
       created: [1, 2, 7],
       collections: [
         {
-          id: 'breakfasts',
+          id: 0,
           name: 'Reggelik',
-          receipts: [4, 5, 6],
+          receipts: [1],
         },
         {
-          id: 'dinners',
+          id: 1,
           name: 'Vacsorák',
-          receipts: [7, 8, 9],
+          receipts: [2],
+        },
+        {
+          id: 2,
+          name: 'Kedvenc',
+          receipts: [4],
         },
       ],
     },
@@ -56,7 +61,7 @@ export const MOCK_USERDATA: IUser[] = [
       created: [3, 5, 6],
       collections: [
         {
-          id: 'breakfasts',
+          id: 0,
           name: 'Reggelik',
           receipts: [4, 5, 6],
         },
@@ -78,7 +83,7 @@ export const MOCK_USERDATA: IUser[] = [
       created: [8, 9],
       collections: [
         {
-          id: 'breakfasts',
+          id: 0,
           name: 'Reggelik',
           receipts: [4, 5, 6],
         },

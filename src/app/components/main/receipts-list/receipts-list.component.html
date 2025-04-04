@@ -1,48 +1,204 @@
-<div class="view-toggle">
-  <button (click)="toggleViewMode()">
-    <i
-      class="fa-solid"
-      [ngClass]="{
-        'fa-border-all': viewMode === 'list',
-        'fa-list': viewMode === 'grid',
-      }"
-    ></i>
-  </button>
+<div class="list-container">
+  <div class="list-left">
+    <div class="search-select">
+      <div class="custom-search">
+        <i class="fa-solid fa-search ps-1 pe-2"></i>
+        <input
+          type="text"
+          placeholder="Keresés"
+          [(ngModel)]="searchService.searchData().searchText"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
+    </div>
+    <!-- TODO:kibővíteni még más szűrőkkel is -->
+    <app-select-filter
+      [title]="'Kategóriák'"
+      [options]="categoryEnum"
+      [selectedValues]="searchData.categories"
+      (selectionChanged)="onFilterChange('categories', $event)"
+    ></app-select-filter>
+    <app-select-filter
+      [title]="'Nehézség'"
+      [options]="difficultyEnum"
+      [selectedValues]="searchData.difficulties"
+      (selectionChanged)="onFilterChange('difficulties', $event)"
+    ></app-select-filter>
+    <app-select-filter
+      [title]="'Értékelés'"
+      [options]="['1', '2', '3', '4', '5']"
+      [selectedValues]="searchData.rating"
+      (selectionChanged)="onFilterChange('rating', $event)"
+    ></app-select-filter>
+
+    <span for="cookingTimeRange" id="cookingTimeLabel">Elkészítési idő:</span> <br />
+    <div class="range-container">
+      <div class="range-wrapper">
+        <input
+          type="range"
+          id="cookingTimeRange"
+          min="0"
+          max="3"
+          step="1"
+          [(ngModel)]="selectedCookingTime"
+          (input)="updateBubblePosition($event)"
+          (change)="onFilterChange('prepTime', [selectedCookingTime.toString()])"
+        />
+        @if (selectedCookingTime > 0 && selectedCookingTime < 3) {
+          <div class="bubble" [ngStyle]="{ left: bubblePosition }">
+            {{ prepTimeOptions[selectedCookingTime] }}
+          </div>
+        }
+      </div>
+      <div class="range-labels">
+        <span class="range-label left-label">Mind</span>
+        <span class="range-label right-label">Hosszadalmas</span>
+      </div>
+    </div>
+  </div>
+  <div class="list-right">
+    <div class="view-toggle" [ngStyle]="{ display: screenWidth > 500 ? 'flex' : 'none' }">
+      <div class="categories">
+        @if (searchData.prepTime.length !== 4) {
+          @for (item of searchData | keyvalue; track item.key) {
+            @if (item.key !== "searchText") {
+              @for (data of item.value; track data) {
+                <span>
+                  {{ filterLabel(item.key) }} : {{ data }}
+                  <i
+                    class="fa-solid fa-trash ms-2"
+                    (click)="removeSelectedFilter(item.key, data)"
+                    (keyup)="removeSelectedFilter(item.key, data)"
+                    tabindex="0"
+                  ></i
+                ></span>
+              }
+            }
+          }
+        }
+      </div>
+
+      <button class="grid" (click)="gridMode = !gridMode">
+        <i
+          class="fa-solid"
+          [ngClass]="{
+            'fa-border-all': gridMode === false,
+            'fa-list': gridMode === true,
+          }"
+          tabindex="0"
+        ></i>
+      </button>
+    </div>
+    <div class="custom-select-order">
+      <span>Rendezés:</span>
+      <div
+        class="select-box"
+        [ngClass]="{ open: isDropdownOpen }"
+        (click)="this.isDropdownOpen = !this.isDropdownOpen"
+        (keyup)="this.isDropdownOpen = !this.isDropdownOpen"
+        tabindex="0"
+      >
+        <span>{{ selectedOption.label }}</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+
+      <ul class="options" *ngIf="isDropdownOpen">
+        <li
+          *ngFor="let option of sortOptions"
+          [class.selected]="option.value === selectedOption.value"
+          (click)="selectOption(option)"
+          (keyup)="selectOption(option)"
+          tabindex="0"
+        >
+          {{ option.label }}
+        </li>
+      </ul>
+    </div>
+    <!-- Kártyás nézet (grid) -->
+    @if (gridMode || screenWidth < 500) {
+      <div appFade>
+        @if (filterdReceipts$ | async; as receipts) {
+          @if (receipts.length) {
+            <div class="grid">
+              @for (receipt of receipts; track receipt.id) {
+                <div class="col">
+                  <app-receipt-card
+                    [receipt]="receipt"
+                    [user]="user!"
+                    [likedByUser]="receipt.isLikedByUser ?? false"
+                    [saveddByUser]="receipt.isSavedByUser ?? false"
+                    (likedChange)="
+                      handleUserAction({
+                        receiptId: $event.receiptId,
+                        action: 'like',
+                        state: $event.liked,
+                      })
+                    "
+                    (savedChange)="
+                      handleUserAction({
+                        receiptId: $event.receiptId,
+                        action: 'save',
+                        state: $event.saved,
+                      })
+                    "
+                  ></app-receipt-card>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="no-receipt">
+              <span>Nincs a keresésnek megfelelő recept</span>
+            </div>
+          }
+        }
+      </div>
+    } @else if (screenWidth > 500 && !gridMode) {
+      <!-- Lista nézet  -->
+      <div appFade>
+        @if (filterdReceipts$ | async; as receipts) {
+          @if (receipts.length) {
+            <div class="list">
+              @for (receipt of receipts; track receipt.id) {
+                <div class="list-item">
+                  <app-receipt-list-item
+                    [receipt]="receipt"
+                    [user]="user!"
+                    [likedByUser]="receipt.isLikedByUser ?? false"
+                    [saveddByUser]="receipt.isSavedByUser ?? false"
+                    (likedChange)="
+                      handleUserAction({
+                        receiptId: $event.receiptId,
+                        action: 'like',
+                        state: $event.liked,
+                      })
+                    "
+                    (savedChange)="
+                      handleUserAction({
+                        receiptId: $event.receiptId,
+                        action: 'save',
+                        state: $event.saved,
+                      })
+                    "
+                  ></app-receipt-list-item>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="no-receipt">
+              <span>Nincs a keresésnek megfelelő recept</span>
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
 </div>
-<!-- Kártyás nézet (grid) -->
-@if (viewMode === "grid") {
-  <div appFade>
-    <div class="grid">
-      @for (receipt of filteredList; track receipt.id) {
-        <div class="col">
-          <app-receipt-card
-            [receipt]="receipt"
-            [user]="user()!"
-            [likedByUser]="isLikedByUser(receipt.id)"
-            [saveddByUser]="isSavedByUser(receipt.id)"
-            (likedChange)="handleLikedChange($event)"
-            (savedChange)="handleSavedChange($event)"
-          ></app-receipt-card>
-        </div>
-      }
-    </div>
-  </div>
-} @else {
-  <!-- Lista nézet  -->
-  <div appFade>
-    <div class="list">
-      @for (receipt of filteredList; track receipt.id) {
-        <div class="list-item">
-          <app-receipt-list-item
-            [receipt]="receipt"
-            [user]="user()!"
-            [likedByUser]="isLikedByUser(receipt.id)"
-            [saveddByUser]="isSavedByUser(receipt.id)"
-            (likedChange)="handleLikedChange($event)"
-            (savedChange)="handleSavedChange($event)"
-          ></app-receipt-list-item>
-        </div>
-      }
-    </div>
-  </div>
+@if (isSaveModalOpen()) {
+  <app-save-recipe
+    [isModalOpen]="isSaveModalOpen()"
+    [user]="user!"
+    [recipe]="underSaveRecipe!"
+    (closeEvent)="this.isSaveModalOpen.set(false)"
+    (saveEvent)="handleSaveEvent($event)"
+  ></app-save-recipe>
 }

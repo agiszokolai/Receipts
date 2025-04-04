@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@angular/core';
 import { LOGIN_DATA, MOCK_USERDATA } from '../mocks/mock-user-data';
-import { IUser } from '../model/user';
+import { IUser, IUserReceipts } from '../model/user';
 import { BehaviorSubject, catchError, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -72,7 +72,7 @@ export class UserService {
     return of(newUser);
   }
 
-  addLikedReceipt(userId: number, receptId: number): Observable<IUser | undefined> {
+  addLikedReceipt(userId: string, receptId: number): Observable<IUser | undefined> {
     const userIndex = MOCK_USERDATA.findIndex((u) => u.userId === userId.toString());
 
     if (userIndex !== -1) {
@@ -93,7 +93,7 @@ export class UserService {
     return of(undefined);
   }
 
-  removeLikedReceipt(userId: number, receptId: number): Observable<IUser | undefined> {
+  removeLikedReceipt(userId: string, receptId: number): Observable<IUser | undefined> {
     const userIndex = MOCK_USERDATA.findIndex((u) => u.userId === userId.toString());
 
     if (userIndex !== -1) {
@@ -110,41 +110,16 @@ export class UserService {
     return of(undefined);
   }
 
-  addSavedReceipt(userId: number, receptId: number): Observable<IUser | undefined> {
-    const userIndex = MOCK_USERDATA.findIndex((u) => u.userId === userId.toString());
-
-    if (userIndex !== -1) {
-      const user = { ...MOCK_USERDATA[userIndex] };
-
-      // Ha nincs inicializálva, hozzunk létre egy üres tömböt
-      /*       user.savedReceipts = user.savedReceipts ? [...user.savedReceipts] : [];
-       */
-      // Ellenőrizzük, hogy már benne van-e
-      /*   if (!user.savedReceipts.includes(receptId)) {
-        user.savedReceipts.push(receptId);
-      } */
-
-      MOCK_USERDATA[userIndex] = user;
-
-      return of(user);
-    }
+  addSavedReceipt(
+    userId: string,
+    receptId: number,
+    collectionId?: number,
+  ): Observable<IUserReceipts | undefined> {
     return of(undefined);
   }
 
-  removeSavedReceipt(userId: number, receptId: number): Observable<IUser | undefined> {
-    const userIndex = MOCK_USERDATA.findIndex((u) => u.userId === userId.toString());
-
-    if (userIndex !== -1) {
-      const user = { ...MOCK_USERDATA[userIndex] };
-
-      /*  user.savedReceipts = user.savedReceipts
-        ? user.savedReceipts.filter((id) => id !== receptId)
-        : []; */
-
-      MOCK_USERDATA[userIndex] = user;
-
-      return of(user);
-    }
+  //TODO: ezt átnézni miért nem jó
+  removeSavedReceipt(userId: string, receptId: number): Observable<IUser | undefined> {
     return of(undefined);
   }
 

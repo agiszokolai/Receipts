@@ -16,4 +16,8 @@ export class UserService {
   getUserByUsername(name: string): Observable<IUser | undefined> {
     return of(undefined);
   }
+
+  getTopThreeUsers(): Observable<IUser[]> {
+    return of([]);
+  }
 }

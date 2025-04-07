@@ -20,6 +20,12 @@ export class ReceiptsService {
   getReceiptsByIds(ids: number[]): Observable<IReceipt[]> {
     return of([]);
   }
+  getTopReceipts(): Observable<IReceipt[]> {
+    return of([]);
+  }
+  getNewReceipts(): Observable<IReceipt[]> {
+    return of([]);
+  }
 
   createReceipt(newReceipt: IReceipt, user: IUser): Observable<IUser | null> {
     return of(null);

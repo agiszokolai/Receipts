@@ -16,28 +16,21 @@
       <p class="navigate">Megtekintés<i class="fa-solid fa-angle-right"></i></p>
     </div>
     <div class="landing-receipts">
-      <div class="receipt">
-        <div class="content">
-          <img [src]="foodImg" alt="" />
-          <span>Grillezett csirkemell</span>
-        </div>
+      @for (receipt of topReceipts; track receipt.id) {
+        <div class="receipt">
+          <div class="receipt-content">
+            <img class="food" [src]="receipt.imageUrl" alt="" />
+            <span>{{ receipt.name }}</span>
+          </div>
 
-        <i class="fa-solid fa-up-right-from-square open-icon"></i>
-      </div>
-      <div class="receipt">
-        <div class="content">
-          <img [src]="foodImg" alt="" />
-          <span>Tyúkhúsleves</span>
+          <i
+            class="fa-solid fa-up-right-from-square open-icon"
+            (click)="navigateToReceipt(receipt)"
+            (keyup)="navigateToReceipt(receipt)"
+            tabindex="0"
+          ></i>
         </div>
-        <i class="fa-solid fa-up-right-from-square open-icon"></i>
-      </div>
-      <div class="receipt">
-        <div class="content">
-          <img [src]="foodImg" alt="" />
-          <span>Lazac párolt rizzsel</span>
-        </div>
-        <i class="fa-solid fa-up-right-from-square open-icon"></i>
-      </div>
+      }
     </div>
   </div>
 </section>
@@ -49,27 +42,16 @@
       <p class="navigate">Megtekintés<i class="fa-solid fa-angle-right"></i></p>
     </div>
     <div class="landing-receipts">
-      <div class="receipt">
-        <div class="content">
-          <img [src]="foodImg" alt="" />
-          <span>Tyúkhúsleves</span>
+      @for (receipt of newRceipts; track receipt.id) {
+        <div class="receipt">
+          <div class="receipt-content">
+            <img class="food" [src]="receipt.imageUrl" alt="" />
+            <span>{{ receipt.name }}</span>
+          </div>
+
+          <i class="fa-solid fa-up-right-from-square open-icon"></i>
         </div>
-        <i class="fa-solid fa-up-right-from-square open-icon"></i>
-      </div>
-      <div class="receipt">
-        <div class="content">
-          <img [src]="foodImg" alt="" />
-          <span>Tyúkhúsleves</span>
-        </div>
-        <i class="fa-solid fa-up-right-from-square open-icon"></i>
-      </div>
-      <div class="receipt">
-        <div class="content">
-          <img [src]="foodImg" alt="" />
-          <span>Tyúkhúsleves</span>
-        </div>
-        <i class="fa-solid fa-up-right-from-square open-icon"></i>
-      </div>
+      }
     </div>
   </div>
 </section>
@@ -78,34 +60,25 @@
   <div class="new">
     <div class="header">
       <p>Népszerű receptkészítők</p>
-      <!--  <p class="navigate">Megtekintés<i class="fa-solid fa-angle-right"></i></p> -->
     </div>
     <div class="carousel slide" id="carousel" data-bs-wrap="true" data-bs-ride="carousel">
       <div class="carousel-inner">
-        <div class="carousel-item active" data-bs-interval="2000">
-          <img [src]="liaImg" alt="" />
-          <div class="caption">
-            <h5>Lia Doe</h5>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+        @for (user of users; track user.userId; let i = $index) {
+          <div
+            class="carousel-item"
+            [ngClass]="{ active: i === 0 }"
+            data-bs-interval="2000"
+            (click)="navigateToUser(user)"
+            (keyup)="navigateToUser(user)"
+            tabindex="0"
+          >
+            <img [src]="user.profilePictureUrl" alt="" />
+            <div class="caption">
+              <span>{{ user.name }}</span>
+              <p>{{ user.description }}</p>
+            </div>
           </div>
-        </div>
-        <div class="carousel-item" data-bs-interval="2000">
-          <img [src]="johnImg" alt="" />
-          <div class="caption">
-            <h5>John Smith</h5>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-          </div>
-        </div>
-        <div class="carousel-item" data-bs-interval="2000">
-          <img [src]="emmaImg" alt="Emma Brown" />
-          <div class="caption">
-            <h5>Emma Brown</h5>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam doloremque, odit
-              sit unde aut veniam maxime
-            </p>
-          </div>
-        </div>
+        }
       </div>
 
       <button
@@ -138,4 +111,33 @@
     </div>
   </div>
 </section>
-<section id="footer"></section>
+
+<section id="footer">
+  <div class="footer-container">
+    <div class="footer-header">
+      <span>Csatlakozz a RecepTár közösséghez!</span>
+      <p>Iratkozz fel a hírlevelünkre a legújabb receptekért.</p>
+    </div>
+    <div class="form-group">
+      <input type="email" id="email" formControlName="email" placeholder=" " />
+      <label for="email">E-mail cím:</label>
+    </div>
+
+    <button type="button">Feliratkozom</button>
+
+    <div class="socials">
+      <i class="fa-brands fa-facebook-f"></i>
+      <i class="fa-brands fa-instagram"></i>
+      <i class="fa-brands fa-youtube"></i>
+    </div>
+    <hr />
+    <div class="footer-bottom">
+      <p>&copy; {{ currentYear }} RecepTár</p>
+      <div class="footer-links">
+        <a href="#">Adatvédelem</a>
+        <a href="#">Felhasználási feltételek</a>
+        <a href="#">Kapcsolat</a>
+      </div>
+    </div>
+  </div>
+</section>

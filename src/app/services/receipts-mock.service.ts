@@ -32,6 +32,21 @@ export class ReceiptsMockService {
     return of(receipts);
   }
 
+  getTopReceipts(): Observable<IReceipt[]> {
+    const sortedReceipts = MOCK_RECEIPTS.sort((a, b) => (b.likes || 0) - (a.likes || 0)).slice(
+      0,
+      3,
+    );
+    return of(sortedReceipts);
+  }
+  getNewReceipts(): Observable<IReceipt[]> {
+    const sortedReceipts = MOCK_RECEIPTS.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    ).slice(0, 3);
+
+    return of(sortedReceipts);
+  }
+
   createReceipt(newReceipt: IReceipt, user: IUser): Observable<IUser | null> {
     // Hozzáadjuk az új receptet a MOCK_RECEIPTS tömbhöz
     MOCK_RECEIPTS.push(newReceipt);

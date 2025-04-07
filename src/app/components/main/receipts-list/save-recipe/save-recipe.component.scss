@@ -37,19 +37,22 @@
     background: c.$light_blue;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     border: 1px solid c.$blue;
     border-radius: 10px;
     padding-block: 5px;
     cursor: pointer;
     position: relative;
-    width: 200px;
+    width: 250px;
 
     span {
       text-align: center;
       padding-inline: 20px;
+      flex: 1;
     }
     i {
+      position: absolute;
+      right: 15px;
       transition: transform 0.3s ease-in-out;
     }
 
@@ -59,9 +62,9 @@
   }
 
   .options {
-    position: relative;
-    width: 100%;
-    top: -3%;
+    position: absolute;
+    width: 50%;
+    top: 54%;
     background: c.$light_blue;
     border: 1px solid c.$blue;
     border-radius: 10px;

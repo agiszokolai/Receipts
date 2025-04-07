@@ -21,6 +21,7 @@ import { filter, Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { IReceipt } from '../../../model/receipt';
 import { generateSlug } from '../../../helpers/validators';
 import { ReceiptsService } from '../../../services/receipts.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -62,6 +63,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   public searchService = inject(SearchService);
   private router = inject(Router);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private receiptService = inject(ReceiptsService);
   private toastr = inject(ToastrService);
 
@@ -81,7 +83,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.userService.user$.subscribe({
+    this.authService.user$.subscribe({
       next: (u) => {
         this.user.set(u); // A felhasználó adatainak beállítása
       },
@@ -123,7 +125,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Kijelentkezés */
   logout(): void {
     if (this.user()) {
-      this.userService.logOut().subscribe({
+      this.authService.logOut().subscribe({
         next: () => {
           this.searchService.searchData().searchText = '';
           this.toastr.info('Sikeres kijelentkezés');

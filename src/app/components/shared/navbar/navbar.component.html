@@ -1,7 +1,6 @@
 <div class="custom-navbar">
   <div class="navbar-left">
     <div
-      class="logo"
       class="logo-container"
       (click)="navigateToLandingPage()"
       (keydown)="navigateToLandingPage()"
@@ -19,30 +18,28 @@
     >
       <span [ngClass]="{ active: activePage === '/receptek' }">Receptek</span>
     </div>
-
-    <div class="search-select">
-      <div
-        class="custom-search"
-        [ngClass]="{ expanded: isSearchActive || isSearchDropdownVisible }"
-      >
-        <i
-          class="search-icon fa-solid fa-search ps-1 pe-2"
-          (click)="isSearchActive = !isSearchActive"
-          (keyup)="isSearchActive = !isSearchActive"
-          tabindex="0"
-        ></i>
-        @if (isSearchActive) {
-          <input
-            type="text"
-            placeholder="Keresés"
-            [(ngModel)]="searchService.searchData().searchText"
-            (ngModelChange)="onSearchChange()"
-          />
-        }
-      </div>
+  </div>
+  <div class="search-select">
+    <div
+      class="custom-search"
+      [ngClass]="{ expanded: isSearchActive || isSearchDropdownVisible || screenWidth < 768 }"
+    >
+      <i
+        class="search-icon fa-solid fa-search ps-1 pe-2"
+        (click)="isSearchActive = !isSearchActive"
+        (keyup)="isSearchActive = !isSearchActive"
+        tabindex="0"
+      ></i>
+      @if (screenWidth < 768 || isSearchActive) {
+        <input
+          type="text"
+          placeholder="Keresés névre vagy kulcsszóra "
+          [(ngModel)]="searchText"
+          (ngModelChange)="onSearchChange()"
+        />
+      }
     </div>
   </div>
-
   <div
     class="user-icon"
     (click)="isUserMenuOpen.set(!isUserMenuOpen())"
@@ -74,13 +71,19 @@
         <button (click)="logout()">Kijelentkezés</button>
       } @else {
         <button
-          (click)="isLoginModalOpen.set(!isLoginModalOpen()); isRegistrationModalOpen.set(false)"
+          (click)="
+            isLoginModalOpen.set(!isLoginModalOpen());
+            isRegistrationModalOpen.set(false);
+            isUserMenuOpen.set(false)
+          "
         >
           Bejelentkezés
         </button>
         <button
           (click)="
-            isRegistrationModalOpen.set(!isRegistrationModalOpen()); isLoginModalOpen.set(false)
+            isRegistrationModalOpen.set(!isRegistrationModalOpen());
+            isLoginModalOpen.set(false);
+            isUserMenuOpen.set(false)
           "
         >
           Regisztráció

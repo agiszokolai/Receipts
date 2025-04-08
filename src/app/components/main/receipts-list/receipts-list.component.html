@@ -1,17 +1,25 @@
 <div class="list-container">
-  <div class="list-left">
+  <div class="list-left" [ngClass]="{ open: issearchDropdownOpen }">
     <div class="search-select">
       <div class="custom-search">
         <i class="fa-solid fa-search ps-1 pe-2"></i>
         <input
           type="text"
-          placeholder="Keresés"
+          placeholder="Keresés névre vagy kulcsszóra "
           [(ngModel)]="searchService.searchData().searchText"
           (ngModelChange)="onSearchChange()"
         />
       </div>
+      @if (screenWidth < 768) {
+        <i
+          class="fa-solid fa-chevron-down search-dropdown"
+          (click)="issearchDropdownOpen = !issearchDropdownOpen"
+          (keyup)="issearchDropdownOpen = !issearchDropdownOpen"
+          tabindex="0"
+          [ngClass]="{ open: issearchDropdownOpen }"
+        ></i>
+      }
     </div>
-    <!-- TODO:kibővíteni még más szűrőkkel is -->
     <app-select-filter
       [title]="'Kategóriák'"
       [options]="categoryEnum"
@@ -57,8 +65,23 @@
     </div>
   </div>
   <div class="list-right">
-    <div class="view-toggle" [ngStyle]="{ display: screenWidth > 500 ? 'flex' : 'none' }">
+    <div class="view-toggle">
       <div class="categories">
+        @if (
+          searchData &&
+          (searchData.searchText ||
+            searchData.categories.length ||
+            searchData.difficulties.length ||
+            searchData.prepTime.length ||
+            searchData.rating.length)
+        ) {
+          <i
+            class="fa-solid fa-trash ms-2 remove-all"
+            (click)="removeAllFilter()"
+            (keyup)="removeAllFilter()"
+            tabindex="0"
+          ></i>
+        }
         @if (searchData.prepTime.length !== 4) {
           @for (item of searchData | keyvalue; track item.key) {
             @if (item.key !== "searchText") {
@@ -78,7 +101,11 @@
         }
       </div>
 
-      <button class="grid" (click)="gridMode = !gridMode">
+      <button
+        class="grid"
+        (click)="gridMode = !gridMode"
+        [ngStyle]="{ display: screenWidth > 500 ? 'flex' : 'none' }"
+      >
         <i
           class="fa-solid"
           [ngClass]="{

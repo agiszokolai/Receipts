@@ -31,6 +31,7 @@ section {
       flex-direction: column;
       justify-content: space-between;
       gap: 20px;
+      color: c.$dark_blue !important;
 
       h1 {
         font-weight: bold;
@@ -82,6 +83,7 @@ section {
       letter-spacing: 2px;
       font-weight: bold;
       color: black;
+      color: c.$dark_blue !important;
 
       &.navigate {
         font-size: 1rem;
@@ -145,6 +147,7 @@ section {
         justify-content: space-between;
         flex-direction: column;
         width: 100%;
+        color: c.$dark_blue;
 
         .food {
           border-radius: 10px;
@@ -187,7 +190,7 @@ section {
         font-size: 1.5rem;
         letter-spacing: 2px;
         font-weight: bold;
-        color: black;
+        color: c.$dark_blue !important;
       }
     }
   }
@@ -200,6 +203,7 @@ section {
       width: 100%;
       border-radius: $border-radius;
       cursor: pointer;
+      color: c.$dark_blue !important;
 
       img {
         width: 150px;
@@ -264,7 +268,7 @@ section {
         height: 40px;
 
         &:focus ~ label {
-          color: white;
+          color: c.$dark_blue;
           top: -20px;
         }
       }

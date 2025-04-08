@@ -1,38 +1,45 @@
 <div class="receipt-container">
   <div class="receipt-header">
     <div class="header-left col-lg-6 col-md-12 col-sm-12">
-      <button (click)="navigateBack()" (keyup)="navigateBack()" tabindex="0">
-        <i class="fa-solid fa-angle-left me-2"></i>Vissza
-      </button>
-      <img [src]="receipt.imageUrl" [alt]="receipt.name" />
-      <div class="category-difficulty-container">
-        <span class="category">{{ receipt.category }}</span>
-        <span
-          class="difficulty"
-          [ngClass]="{
-            easy: receipt.difficulty === 'Könnyű',
-            medium: receipt.difficulty === 'Közepes',
-            hard: receipt.difficulty === 'Nehéz',
-          }"
-          >{{ receipt.difficulty }}</span
-        >
+      <div class="back-button-div">
+        <button (click)="navigateBack()" (keyup)="navigateBack()" tabindex="0">
+          <i class="fa-solid fa-angle-left me-2"></i>Vissza
+        </button>
       </div>
+      <div class="header-container">
+        <div class="receipt-image-container">
+          <img [src]="receipt.imageUrl" [alt]="receipt.name" />
+        </div>
+        <div class="category-difficulty-container">
+          <span class="category" tooltipStr="Kategória">{{ receipt.category }}</span>
+          <span
+            class="difficulty"
+            tooltipStr="Nehézség"
+            [ngClass]="{
+              easy: receipt.difficulty === 'Könnyű',
+              medium: receipt.difficulty === 'Közepes',
+              hard: receipt.difficulty === 'Nehéz',
+            }"
+            >{{ receipt.difficulty }}</span
+          >
+        </div>
 
-      <div class="rating mb-3">
-        <div class="star">
-          <span> {{ receipt.averageRating }}</span>
-          <i class="fa-solid fa-star"></i>
+        <div class="rating mb-3">
+          <div class="star" tooltipStr="Átlagos értékelés">
+            <span> {{ receipt.averageRating }}</span>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div class="likes" tooltipStr="Kedvelések">
+            <span>{{ receipt.likes }}</span>
+            <i class="fa-solid fa-heart"></i>
+          </div>
         </div>
-        <div class="likes">
-          <span>{{ receipt.likes }}</span>
-          <i class="fa-solid fa-heart"></i>
-        </div>
-      </div>
-      <div class="receipt-tags">
-        <div class="tags">
-          @for (t of receipt.tags; track t) {
-            <span class="tag">{{ t }}</span>
-          }
+        <div class="receipt-tags">
+          <div class="tags">
+            @for (t of receipt.tags; track t) {
+              <span class="tag">{{ t }}</span>
+            }
+          </div>
         </div>
       </div>
     </div>

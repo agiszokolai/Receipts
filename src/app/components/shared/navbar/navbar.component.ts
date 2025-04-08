@@ -53,6 +53,9 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isSearchActive = false;
 
+  searchText = '';
+  screenWidth = window.innerWidth;
+
   activePage = window.location.pathname;
   allReceipts: IReceipt[] = [];
 
@@ -68,6 +71,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   private toastr = inject(ToastrService);
 
   ngOnInit(): void {
+    this.searchText = this.searchService.searchData().searchText;
     this.getAllReceipts();
     /*  this.searchService.filteredList$.pipe(takeUntil(this.destroyed$)).subscribe({
       next: (filteredList) => {
@@ -80,8 +84,13 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe((event: NavigationEnd) => {
         this.activePage = event.urlAfterRedirects;
       });
-  }
 
+    this.screenWidth = window.innerWidth;
+    window.addEventListener('resize', this.onResize.bind(this));
+  }
+  onResize(event: any) {
+    this.screenWidth = event.target.innerWidth;
+  }
   ngAfterViewInit(): void {
     this.authService.user$.subscribe({
       next: (u) => {
@@ -111,6 +120,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Keresendő szó változik */
   onSearchChange() {
     this.isSearchDropdownVisible = true;
+    this.searchService.searchData().searchText = this.searchText;
     this.searchService.changeSearchData({ searchText: this.searchService.searchData().searchText });
     this.filterdReceipts$ = this.searchService.filteredList$;
   }
@@ -157,6 +167,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/receptek']);
     this.activePage = '/receptek';
     this.isSearchDropdownVisible = false;
+    this.searchText = '';
   }
 
   navigateToReceipt(receipt: IReceipt): void {
@@ -165,6 +176,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.searchService.searchData().searchText = '';
     this.isSearchDropdownVisible = false;
+    this.searchText = '';
   }
 
   //** Legördülő menük bezárása ha nem oda van kattintva */

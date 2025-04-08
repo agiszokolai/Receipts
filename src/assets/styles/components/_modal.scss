@@ -1,4 +1,18 @@
 @use "../variables/colors" as c;
+.form-group {
+  justify-content: center;
+
+  label {
+    width: 80%;
+    margin-left: 0;
+  }
+}
+.alert {
+  color: red;
+  padding: 0;
+  margin-top: -15px;
+  margin-bottom: 0;
+}
 
 .custom-modal-backdrop {
   position: fixed;

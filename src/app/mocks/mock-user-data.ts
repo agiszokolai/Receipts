@@ -3,13 +3,13 @@ import { IUser } from '../model/user';
 export const LOGIN_DATA: { password: string; email: string; token: string }[] = [
   {
     email: 'a@a.com',
-    password: 'alma',
+    password: 'alma11',
     token:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkxpYSBEb2UiLCJpYXQiOjE1MTYyMzkwMjIsIm5hbWVJZCI6IjEifQ.X64kTqTCgs_wrI4hqU974-oK2VuRIZMzrHt7vpZxW80',
   },
   {
     email: 'john@smith.com',
-    password: 'alma',
+    password: 'alma11',
     token:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gU21pdGgiLCJpYXQiOjE1MTYyMzkwMjIsIm5hbWVJZCI6IjIifQ.aumSCOyFQWAhhf7bCTRF_mqmFRaKWovqgSZaBQVTAMk',
   },

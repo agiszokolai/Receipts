@@ -13,7 +13,14 @@
   <div class="popular">
     <div class="header">
       <p>Népszerű receptek</p>
-      <p class="navigate">Megtekintés<i class="fa-solid fa-angle-right"></i></p>
+      <p
+        class="navigate"
+        (click)="navigateWithSort('popular')"
+        (keyup)="navigateWithSort('popular')"
+        tabindex="0"
+      >
+        Megtekintés<i class="fa-solid fa-angle-right"></i>
+      </p>
     </div>
     <div class="landing-receipts">
       @for (receipt of topReceipts; track receipt.id) {
@@ -39,7 +46,14 @@
   <div class="new">
     <div class="header">
       <p>Új receptek</p>
-      <p class="navigate">Megtekintés<i class="fa-solid fa-angle-right"></i></p>
+      <p
+        class="navigate"
+        (click)="navigateWithSort('newest')"
+        (keyup)="navigateWithSort('newest')"
+        tabindex="0"
+      >
+        Megtekintés<i class="fa-solid fa-angle-right"></i>
+      </p>
     </div>
     <div class="landing-receipts">
       @for (receipt of newRceipts; track receipt.id) {

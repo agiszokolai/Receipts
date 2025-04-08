@@ -18,17 +18,12 @@
   &:hover {
     .card-footer {
       .receipt-button {
-        animation: slideUp 0.5s ease-in-out forwards;
+        transform: translateY(0);
+        opacity: 1;
       }
     }
   }
-  &:not(:hover) {
-    .card-footer {
-      .receipt-button {
-        animation: slideDown 0.5s ease-in-out forwards;
-      }
-    }
-  }
+
   .img-container {
     border-radius: 10px 10px 0px 0px;
     img {
@@ -70,6 +65,7 @@
     .receipt-button {
       transform: translateY(100%);
       opacity: 0;
+      transition: all 0.5s ease-in-out;
     }
 
     .full {

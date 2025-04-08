@@ -17,6 +17,7 @@ import { SaveRecipeComponent } from './save-recipe/save-recipe.component';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../services/auth.service';
 import { UserReceiptsService } from '../../../services/user-receipts.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-receipts-list',
@@ -47,6 +48,7 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
   underSaveRecipe: IReceipt | null = null;
 
   isDropdownOpen = false;
+  issearchDropdownOpen = false;
   selectedOption = { label: 'Alapértelmezett', value: 'default' };
 
   sortOptions = [
@@ -83,6 +85,8 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
   private readonly userService = inject(UserService);
   private readonly userReceiptsService = inject(UserReceiptsService);
   private readonly toastr = inject(ToastrService);
+  private readonly router = inject(ActivatedRoute);
+  private readonly route = inject(Router);
 
   get searchData() {
     return this.searchService.searchData();
@@ -90,6 +94,15 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.screenWidth = window.innerWidth;
+
+    const state = history.state.sort;
+
+    if (state) {
+      const matchingOption = this.sortOptions.find((opt) => opt.value === state);
+      if (matchingOption) {
+        this.selectedOption = matchingOption;
+      }
+    }
 
     this.getActiveUser();
     this.loadFilteredList();
@@ -246,6 +259,16 @@ export class ReceiptsListComponent implements OnInit, OnDestroy {
       const modifiedList = originalList.filter((item) => item !== value);
       this.searchService.changeSearchData({ ...this.searchData, [type]: modifiedList });
     }
+  }
+  removeAllFilter() {
+    this.selectedCookingTime = 0;
+    this.searchService.changeSearchData({
+      searchText: '',
+      categories: [],
+      difficulties: [],
+      prepTime: [],
+      rating: [],
+    });
   }
 
   /**

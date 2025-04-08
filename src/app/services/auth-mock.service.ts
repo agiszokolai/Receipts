@@ -12,6 +12,11 @@ export class AuthMockService {
   user$ = this._userSubject.asObservable();
 
   logIn(email: string, password: string): Observable<IUser | null> {
+    console.log('adatok:', email, password);
+    console.log('data:', LOGIN_DATA);
+
+    console.log(LOGIN_DATA.find((u) => u.email === email && u.password === password));
+
     return of(LOGIN_DATA.find((u) => u.email === email && u.password === password)).pipe(
       switchMap((foundUser) => {
         if (!foundUser) {
@@ -56,7 +61,7 @@ export class AuthMockService {
 
   registration(email: string, name: string, username: string, password: string): Observable<IUser> {
     const newUser: IUser = {
-      userId: (Math.random() * 100).toFixed(0),
+      userId: (MOCK_USERDATA.length + 1).toString(),
       email,
       username,
       password,
@@ -73,6 +78,7 @@ export class AuthMockService {
 
     return of(newUser);
   }
+
   private getUserFromStorage(): IUser | null {
     const storedUserToken = sessionStorage.getItem('authToken');
 
@@ -94,5 +100,34 @@ export class AuthMockService {
     }
 
     return null; // Ha nincs authToken, akkor null
+  }
+
+  //TODO: valamiért undefined a jelszó
+  setNewPassword(email: string, password: string): Observable<boolean> {
+    /*  console.log('LOGINDATA', LOGIN_DATA);
+    console.log('MOCK_USERDATA', MOCK_USERDATA);
+    console.log('Beállítás előtt:', JSON.stringify(MOCK_USERDATA, null, 2)); */
+
+    const userIndex = MOCK_USERDATA.findIndex((u) => u.email === email);
+    const loginIndex = LOGIN_DATA.findIndex((u) => u.email === email);
+    /* console.log('userIndex', userIndex);
+    console.log('loginIndex', loginIndex);
+ */
+    if (userIndex !== -1 && loginIndex !== -1) {
+      // Módosítjuk a jelszót mindkét tömbben
+      MOCK_USERDATA[userIndex] = {
+        ...MOCK_USERDATA[userIndex],
+        password: password,
+      };
+      LOGIN_DATA[loginIndex].password = password;
+      /*   console.log('Beállítás után:', JSON.stringify(MOCK_USERDATA[userIndex], null, 2));
+      console.log('Frissített jelszó MOCK_USERDATA:', MOCK_USERDATA[userIndex]);
+
+      console.log('Frissített jelszó LOGIN_DATA:', LOGIN_DATA[loginIndex]); */
+      return of(true);
+    } else {
+      console.log('Felhasználó nem található');
+      return of(false); // Ha nem található a felhasználó, false-t adunk vissza
+    }
   }
 }

@@ -15,6 +15,7 @@ import { SearchService } from '../../../../services/search.service';
 import { SaveRecipeComponent } from '../save-recipe/save-recipe.component';
 import { UserReceiptsService } from '../../../../services/user-receipts.service';
 import { AuthService } from '../../../../services/auth.service';
+import { TooltipStrDirective } from 'ngx-tooltip-directives';
 
 @Component({
   selector: 'app-receipt',
@@ -25,6 +26,7 @@ import { AuthService } from '../../../../services/auth.service';
     ToastrModule,
     AuthenticationWarningModalComponent,
     SaveRecipeComponent,
+    TooltipStrDirective,
   ],
   templateUrl: './receipt.component.html',
 })

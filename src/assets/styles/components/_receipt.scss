@@ -400,6 +400,20 @@ app-authentication-warning {
 }
 
 @media (max-width: 992px) {
+  .back-button-div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    button {
+      width: 50%;
+    }
+  }
+
+  .receipt-image-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
   .steps-ingredients-container {
     flex-flow: wrap-reverse;
     flex-direction: unset;
@@ -417,5 +431,34 @@ app-authentication-warning {
       width: 50%;
       margin-bottom: 10px;
     }
+  }
+}
+@media (max-width: 768px) {
+  .receipt-container {
+    top: 20%;
+  }
+  .back-button-div {
+    button {
+      width: 100%;
+    }
+  }
+  .header-right {
+    width: 100%;
+  }
+}
+@media (max-width: 372px) {
+  .receipt-save {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: center;
+    align-items: center;
+    button {
+      font-size: 0.8rem;
+    }
+  }
+}
+@media (max-width: 350px) {
+  .receipt-container {
+    top: 25%;
   }
 }

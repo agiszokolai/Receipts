@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { blankFood, blankUser, foodLanding } from '../../helpers/constants';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive';
 import { UserService } from '../../services/user.service';
 import { take } from 'rxjs';
 import { IUser } from '../../model/user';
@@ -13,7 +12,7 @@ import { generateSlug } from '../../helpers/validators';
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [CommonModule, ScrollRevealDirective],
+  imports: [CommonModule],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss',
 })
@@ -34,8 +33,6 @@ export class LandingPageComponent implements OnInit {
   private receiptsService = inject(ReceiptsService);
 
   ngOnInit(): void {
-    console.log('init');
-
     this.getTopUsers();
     this.getTopReceipts();
     this.getNewReceipts();
@@ -47,7 +44,6 @@ export class LandingPageComponent implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: (users) => {
-          console.log(users);
           this.users = users;
         },
       });
@@ -80,7 +76,6 @@ export class LandingPageComponent implements OnInit {
             }
           }
           this.newRceipts = receipts;
-          console.log(receipts);
         },
       });
   }
@@ -88,6 +83,7 @@ export class LandingPageComponent implements OnInit {
   navigateToReceipts(): void {
     this.router.navigate(['/receptek']);
   }
+
   navigateToReceipt(receipt: IReceipt): void {
     this.router.navigate(['/recept', generateSlug(receipt.name)], {
       state: { id: receipt.id, direction: `/` },
@@ -96,5 +92,11 @@ export class LandingPageComponent implements OnInit {
 
   navigateToUser(user: IUser): void {
     this.router.navigate(['/profil', user.username]);
+  }
+
+  navigateWithSort(sortType: string) {
+    this.router.navigate(['/receptek'], {
+      state: { sort: sortType },
+    });
   }
 }

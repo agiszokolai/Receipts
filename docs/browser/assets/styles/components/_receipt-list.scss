@@ -1,0 +1,408 @@
+@use "../variables/colors" as c;
+
+.list-container {
+  display: flex;
+  margin: 15px 20px 0px 20px;
+  height: 90%;
+  padding-bottom: 10px;
+
+  .list-left {
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    padding: 20px;
+    /*  height: 100%; */
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+    background-color: white;
+    .search-select {
+      /*  display: flex;
+      justify-content: center;
+      gap: 10px; */
+
+      .custom-search {
+        /* background-color: white;
+      padding-inline: 10px;
+      border-radius: 10px;
+
+       */
+        border: 1px solid grey;
+        border-radius: 10px;
+        display: flex;
+        padding-inline: 10px;
+        align-items: center;
+        input {
+          width: 100%;
+          height: 35px;
+          min-width: 80px;
+          border: 0;
+          font-size: 0.8rem;
+          &:focus {
+            outline: none;
+          }
+        }
+      }
+    }
+
+    .custom-select {
+      margin-top: 50px;
+      span {
+        font-size: 1.3rem;
+      }
+      i {
+        font-size: 1.3rem;
+        transition: all 0.3 ease-in-out;
+      }
+      .categories-container {
+        display: flex;
+        justify-content: space-between;
+
+        i {
+          transition: all 0.4s ease-in-out;
+        }
+        &.open {
+          i {
+            transform: rotate(-180deg);
+          }
+        }
+      }
+      .categories {
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+        label {
+          margin: 5px;
+          font-size: 1.1rem;
+          text-wrap: wrap;
+          display: flex;
+
+          input {
+            transform: scale(1.5);
+            margin-right: 10px;
+          }
+
+          .label-text {
+            display: flex;
+            flex-direction: row;
+            span {
+              font-size: 1rem;
+              min-width: 15px;
+            }
+            i {
+              color: c.$blue;
+            }
+          }
+        }
+      }
+      p {
+        color: c.$dark_blue;
+        text-decoration: underline;
+        cursor: pointer;
+
+        &:hover {
+          color: c.$blue;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  .list-right {
+    height: 100%;
+    background: c.$light_blue !important;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    /* Nézetváltó gomb */
+    .view-toggle {
+      position: sticky;
+      /* top: 50px; */
+      left: 0;
+
+      z-index: 1;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      background: transparent !important;
+
+      .categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        align-items: center;
+        .remove-all {
+          font-size: 1.3rem;
+        }
+        span {
+          margin-inline-end: 10px;
+          border-radius: 10px;
+          background-color: c.$lighter_blue;
+          padding: 5px 10px;
+          border: 1px solid c.$blue;
+
+          i {
+            color: c.$blue;
+            &:hover {
+              color: red;
+            }
+          }
+        }
+      }
+      button {
+        margin-left: auto;
+        width: 50px;
+        height: 30px;
+        padding-inline: 10px !important;
+        i {
+          transition: transform 0.3s ease-in-out;
+        }
+      }
+    }
+
+    /* Kártyás nézet stílus */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      height: 370px;
+      gap: 20px;
+      padding: 20px;
+      justify-content: center;
+      grid-auto-flow: dense;
+
+      /*    .col {
+        &:nth-child(4n + 1) {
+          grid-column: span 2;
+        }
+      } */
+    }
+
+    .no-receipt {
+      display: flex;
+      justify-content: center;
+      /*  margin-top: 20px; */
+      padding-top: 20px;
+      font-size: 1.1rem;
+    }
+
+    /* Lista nézet stílusa*/
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 20px;
+      width: 90%;
+      margin: 0 auto;
+    }
+
+    .list-item {
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: white;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    app-receipt-list-item {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+}
+
+#cookingTimeLabel {
+  font-size: 1.3rem;
+  padding-left: 16px;
+  display: block;
+}
+
+.custom-select-order {
+  /*  position: relative;
+  display: inline-block;
+  width: 200px; */
+  display: flex;
+  align-items: center;
+  width: max-content;
+  padding-inline: 15px;
+  margin-left: 15px;
+  position: relative;
+
+  span {
+    padding-right: 10px;
+    font-weight: bold;
+  }
+  .select-box {
+    background: c.$light_blue;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid c.$blue;
+    border-radius: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+    width: 200px;
+
+    i {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    &.open i {
+      transform: rotate(-180deg);
+    }
+  }
+
+  .options {
+    position: absolute;
+    width: 80%;
+    top: 37px;
+    left: 25%;
+    background: c.$light_blue;
+    border: 1px solid c.$blue;
+    border-radius: 15px;
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 12;
+
+    li {
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        background: mix(white, c.$light_blue, 50%);
+        color: c.$dark_blue;
+      }
+
+      &:first-child {
+        border-radius: 15px 15px 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 15px 15px;
+      }
+
+      &.selected {
+        font-weight: bold;
+        color: c.$dark_blue;
+        background: mix(white, c.$light_blue, 50%);
+      }
+    }
+  }
+}
+
+.range-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  z-index: 5;
+  justify-content: center;
+  flex-direction: column;
+
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+
+    .range-label {
+      font-size: 14px;
+      font-weight: bold;
+      color: #555;
+    }
+  }
+
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 5px;
+    border-radius: 5px;
+    outline: none;
+    z-index: 10;
+    background: c.$blue;
+
+    margin-top: 20px;
+  }
+  .bubble {
+    position: absolute;
+    top: 30px;
+    transform: translateX(-50%);
+    background: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: left 0.2s ease-in-out;
+  }
+}
+
+@media (min-width: 992px) {
+  .list-left {
+    /*  width: 25%; */
+    flex: 0 0 20%;
+  }
+  .list-right {
+    flex: 0 0 80%;
+  }
+}
+@media (max-width: 775px) {
+  .list-left {
+    padding: 20px 100px !important;
+    height: 100px;
+
+    &.open {
+      height: auto;
+    }
+
+    .search-select {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      .custom-search {
+        width: 80%;
+      }
+
+      .search-dropdown {
+        transition: all 0.3s ease-in-out;
+        &.open {
+          transform: rotate(-180deg);
+        }
+      }
+    }
+  }
+}
+@media (max-width: 500px) {
+  .list-left {
+    padding: 20px 50px !important;
+  }
+  .custom-select-order {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .categories {
+    flex-direction: column;
+    justify-content: center;
+    span {
+      width: 200px;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  app-receipt-list-item {
+    flex-direction: column;
+  }
+}
+@media (max-width: 776px) {
+  .list-container {
+    flex-direction: column;
+  }
+}

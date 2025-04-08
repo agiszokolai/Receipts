@@ -14,20 +14,16 @@
       <ng-container *ngIf="formTemplate() as template">
         <ng-container *ngTemplateOutlet="template"></ng-container>
       </ng-container>
-
-      <!-- @else if(content){
-
-      } -->
     </div>
     <div class="footer">
-      <!--    <button
+      <button
         class="base-button"
         type="submit"
-        [disabled]="this.formGroup.invalid"
+        [disabled]="this.formGroup()?.invalid"
         (click)="onSubmit()"
       >
         {{ footerButtonLabel() }}
-      </button> -->
+      </button>
       @if (isFooterCancelVisible()) {
         <button class="base-button" (click)="onCloseModalClick()">Mégse</button>
       }

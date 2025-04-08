@@ -321,7 +321,12 @@ form {
     }
   }
 }
-
+.alert {
+  color: red !important;
+  padding: 0 !important;
+  margin-top: -15px !important;
+  margin-bottom: 0 !important;
+}
 .footer {
   display: flex;
   flex-direction: column;

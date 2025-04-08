@@ -21,12 +21,6 @@ export class ReceiptsMockService {
     return of(receipt ?? null);
   }
 
-  getReceiptByName(name: string): Observable<IReceipt | null> {
-    const receipt = MOCK_RECEIPTS.find((r) => generateSlug(r.name) === name);
-
-    return of(receipt ?? null);
-  }
-
   getReceiptsByIds(ids: number[]): Observable<IReceipt[]> {
     const receipts = MOCK_RECEIPTS.filter((r) => ids.includes(r.id));
     return of(receipts);

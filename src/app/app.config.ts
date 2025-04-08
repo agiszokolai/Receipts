@@ -1,4 +1,4 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { environment } from '../environments/environment';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
@@ -13,6 +13,12 @@ import { UserReceiptsService } from './services/user-receipts.service';
 import { UserReceiptsMockService } from './services/user-receipts-mock.service';
 import { AuthService } from './services/auth.service';
 import { AuthMockService } from './services/auth-mock.service';
+import { NgxTooltipDirectivesModule, TooltipOptions } from 'ngx-tooltip-directives';
+
+const myDefaultTooltipOptions: TooltipOptions = {
+  backgroundColor: '#caf0f8',
+  borderColor: '#03045e',
+};
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -47,5 +53,6 @@ export const appConfig: ApplicationConfig = {
       preventDuplicates: true,
       timeOut: 2000,
     }),
+    importProvidersFrom(NgxTooltipDirectivesModule.forRoot(myDefaultTooltipOptions)),
   ],
 };

@@ -6,11 +6,13 @@
   <p>&#64;{{ user().username }}</p>
   <div>{{ user().description }}</div>
   <div class="numbers">
-    <span>
+    <span tooltipStr="Receptek">
       <i class="fa-solid fa-receipt"></i>
       {{ user().receipts.created.length }}</span
     >
-    <span><i class="fa-solid fa-heart pe-2"></i> {{ userReceiptsLikes() }}</span>
+    <span tooltipStr="Kedvelések a recepteken"
+      ><i class="fa-solid fa-heart pe-2"></i> {{ userReceiptsLikes() }}</span
+    >
   </div>
 </div>
 <hr />

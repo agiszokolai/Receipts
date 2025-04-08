@@ -1,30 +1,65 @@
 <app-modal
-  [isModalVisible]="isLoginModalOpen()"
+  [isModalVisible]="isModalOpen()"
   [header]="'Bejelentkezés'"
-  [size]="'small'"
+  [size]="'medium'"
   [footerButtonLabel]="'Bejelentkezés'"
   [isFooterCancelVisible]="true"
   [formGroup]="logInForm"
   [formTemplate]="login"
-  (submitEvent)="onSubmit()"
+  (submitEvent)="onSubmit($event)"
   (closeEvent)="closeModal()"
 ></app-modal>
 
+<!-- TODO: megcsinálni hogy enterre is működjön asumit -->
 <ng-template #login>
-  <form [formGroup]="logInForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
+  <form [formGroup]="logInForm">
     <div class="form-group">
-      <input type="email" id="email" formControlName="email" placeholder=" " />
-      <label for="email">E-mail cím:</label>
+      <input type="email" id="login-email" formControlName="email" placeholder=" " />
+      <label for="login-email">E-mail cím:</label>
     </div>
+    @if (logInForm.get("email")?.touched && logInForm.get("email")?.invalid) {
+      <div class="alert">
+        @if (logInForm.get("email")?.hasError("required")) {
+          <small> Az e-mail cím megadása kötelező! </small>
+        }
+        @if (logInForm.get("email")?.hasError("invalidEmail")) {
+          <small> Érvénytelen e-mail cím formátum! </small>
+        }
+      </div>
+    }
+
     <div class="form-group">
       <input type="password" id="password" formControlName="password" placeholder=" " />
       <label for="password">Jelszó:</label>
     </div>
+    @if (logInForm.get("password")?.touched && logInForm.get("password")?.invalid) {
+      <div class="alert">
+        @if (logInForm.get("password")?.hasError("required")) {
+          <small> A jelszó megadása kötelező! </small>
+        }
+        @if (logInForm.get("password")?.hasError("minlength")) {
+          <small> A jelszónak legalább 6 karakter hosszúnak kell lennie! </small>
+        }
+      </div>
+    }
+
+    <div class="forgot-password-div mt-5">
+      <a (click)="onForgotPasswordClick()" (keydown)="onForgotPasswordClick()" tabindex="0"
+        >Elfelejtettem a jelszavam</a
+      >
+    </div>
   </form>
 
-  <div class="footer w-100">
+  <!-- <div class="footer w-100">
     <button class="base-button submit" type="submit" [disabled]="logInForm.invalid" tabindex="0">
       Bejelentkezés
     </button>
-  </div>
+  </div> -->
 </ng-template>
+
+@if (isForgotPasswordModalOpen()) {
+  <app-forgot-password
+    [isForgotPasswordModalOpen]="isForgotPasswordModalOpen()"
+    (closeEvent)="closePasswordModal()"
+  ></app-forgot-password>
+}

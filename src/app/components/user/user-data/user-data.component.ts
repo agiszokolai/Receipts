@@ -18,11 +18,11 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ModalComponent } from '../../shared/modal/modal.component';
 import { emailValidator, passwordConfirmValidator } from '../../../helpers/validators';
 import { blankUser } from '../../../helpers/constants';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { RecipeCreateComponent } from '../recipe-create/recipe-create.component';
+import { TooltipStrDirective } from 'ngx-tooltip-directives';
 
 @Component({
   selector: 'app-user-data',
@@ -31,9 +31,9 @@ import { RecipeCreateComponent } from '../recipe-create/recipe-create.component'
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    ModalComponent,
     ToastrModule,
     RecipeCreateComponent,
+    TooltipStrDirective,
   ],
   templateUrl: './user-data.component.html',
 })

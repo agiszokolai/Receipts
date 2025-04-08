@@ -23,7 +23,7 @@ export class RegistrationComponent {
     email: new FormControl('', [Validators.required, emailValidator()]),
     username: new FormControl('', Validators.required),
     name: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required),
+    password: new FormControl('', [Validators.required]),
     passwordConfirm: new FormControl('', [Validators.required, passwordConfirmValidator()]),
   });
 
@@ -35,23 +35,25 @@ export class RegistrationComponent {
    *  Reisztráció
    * @param formData a form
    */
-  onSubmit() {
-    const formData = this.registrationForm.getRawValue();
-
-    this.authService
-      .registration(formData.email!, formData.name!, formData.username!, formData.password!)
-      .pipe(take(1))
-      .subscribe({
-        next: () => {
-          this.closeModal();
-          this.toastr.success('Sikeres regisztráció!');
-          this.router.navigate(['/profil', formData.username]);
-        },
-        error: (error) => {
-          this.toastr.warning('Hiba történt a regisztráció során');
-          console.log('Hiba történt:', error.message);
-        },
-      });
+  onSubmit(data: any) {
+    /* const formData = this.registrationForm.getRawValue(); */
+    if (this.registrationForm.valid) {
+      this.authService
+        .registration(data.email!, data.name!, data.username!, data.password!)
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            //TODO: regisztráció után bejelentkeztetni a felhasználót
+            this.closeModal();
+            this.toastr.success('Sikeres regisztráció!');
+            this.router.navigate(['/profil', data.username]);
+          },
+          error: (error) => {
+            this.toastr.warning('Hiba történt a regisztráció során');
+            console.log('Hiba történt:', error.message);
+          },
+        });
+    }
   }
 
   closeModal() {
